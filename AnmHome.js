@@ -1,0 +1,13 @@
+import React from 'react';
+import { Typography } from "@material-ui/core";
+
+export default function AnmHome () {
+    return(
+        <div>
+        There's no place like home...
+        There's no place like home...
+        There's no place like home...
+        There's no place like home...
+        </div>
+    );
+};
