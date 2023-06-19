@@ -77,11 +77,10 @@ const anmShop = () => {
 };
 
 const anmRecord = () => {
-  if (whichPage.type  === AnmRecord) {
+  if (whichPage === <AnmRecord />) {
     setKey((prevKey) => prevKey + 1);
-    setWhichPage(<AnmRecord key={Date.now()} />);
   } else {
-  setWhichPage(<AnmRecord key={key} />);
+  setWhichPage(<AnmRecord key={key}/>);
   handleCloseMain();
   }
 };
@@ -92,7 +91,7 @@ const anmAbout = () => {
 };
 
 const anmLogin = () => {
-  setWhichPage(<AnmLogin />);
+  setComponentVisible(!isComponentVisible);
   handleCloseMain();
 };
 

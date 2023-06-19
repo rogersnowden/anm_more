@@ -1,11 +1,8 @@
 // AnmRecord
 import React, { useState, useEffect, useRef } from "react";
-// import { makeStyles } from '@material-ui/core/styles';
 import { makeStyles } from '@mui/styles';
-//import { createTheme, ThemeProvider } from '@mui/material/styles';
-import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import createBreakpoints from '@material-ui/core/styles/createBreakpoints';
-import { createTheme, ThemeProvider } from '@material-ui/core/styles';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import Slider from "react-slick";
 
@@ -27,6 +24,8 @@ import PlayIconDisabled from './PlayButtonDisabled';
 import PauseButton from './PauseButton';
 import RecButton from './RecButton';
 import RecButtonOff from './RecButtonOff';
+import CancelIcon from '@mui/icons-material/Cancel';
+import IconButton from '@mui/material/IconButton';
 import TinyDotRed from './TinyDotRed';
 import TinyDotBlue from './TinyDotBlue';
 import SaveButton from './SaveButton';
@@ -50,16 +49,28 @@ const theme = createTheme({
 
 console.log('theme: ' + theme);
 
-export default function Glompf() {
+export default function AnmRecord(props) {
+
+  console.log("props:" + props);
 
   const useStyles = makeStyles((theme) => ({
       appBar: {
       paddingBottom: '15vw',
       marginBottom: '10vw',
     },
+    container: {
+      position: 'relative',
+    },
+    iconButton:{
+      position: 'absolute',
+      top: '-47% !important',
+      right: '-47% !important',
+      zIndex: 1,
+     },
     upperBezel: {
       border: 'solid 3px #0ff',
       position: 'absolute',
+      zIndex: 3,
       paddingTop: '0vh',
       top: '60% !important',
       left: '50%',
@@ -275,6 +286,7 @@ const instance = Axios.create({
 
 const UserBase = "cust/users/thisUser/collection/thisBook/";
 
+const [showComponent, setShowComponent] = useState(true);
 const [imgURLArray, setImgURLArray] = useState();
 const [completeImgURLArray, setCompleteImgURLArray] = useState();
 const [bookTextArray, setBookTextArray] = useState();
@@ -292,7 +304,7 @@ const [currentPageText, setCurrentPageText] = useState();
 const [currentPageTextColor, setCurrentPageTextColor] = useState();
 const [currentPageIndex, setCurrentPageIndex]= useState();
 const [portrait, setPortrait] = useState(false);
-const [isLoading, setIsLoading] = useState(true);
+const [isLoading, setIsLoading] = useState(false); // true for prod
 
 // init json, loaded from server, then appended w/ url prefix
 const [rawBookSetJSON, setRawBookSetJSON] = useState();
@@ -723,6 +735,10 @@ const onSwipe = (props) => {
     }
   };
 
+  function handleCancel() {
+    setShowComponent(false);
+//    console.log("record cancel");
+  };
 
   // TODO: load cached audio blobs/files, also save recorded files
   const renderSlides = () => {
@@ -740,46 +756,52 @@ const onSwipe = (props) => {
       }
     };
   //TODO - Fix the spinner, not spinning 
-    return (
-    <div className="App" >
-       {{isLoading} && (
-        <div>
-          <Spinner />
+  return (
+    <ThemeProvider theme={theme}>
+      {showComponent && (
+        <div className="App">
+          {isLoading ? (
+            <div>
+              <Spinner />
+            </div>
+          ) : (
+            <React.Fragment>
+              <Box className={classes.upperBezel} alignItems="center">
+                <IconButton onClick={handleCancel} className={classes.iconButton}>
+                  <CancelIcon />
+                </IconButton>
+                <Slider
+                  className={classes.sliderBox}
+                  initialSlide={0}
+                  cssEase="ease-out"
+                  useTransform={true}
+                  speed={100}
+                  fade={false}
+                  dots={false}
+                  infinite={false}
+                  arrows={true}
+                  afterChange={onChangeSlide}
+                  onSwipe={onSwipe}
+                >
+                  {renderSlides()}
+                </Slider>
+              </Box>
+              <Grid container justify="space-around" className={classes.recordControls}>
+                <Grid>
+                  {/* Your existing code */}
+                </Grid>
+                <Grid>
+                  {/* Your existing code */}
+                </Grid>
+                <Grid>
+                  {/* Your existing code */}
+                </Grid>
+              </Grid>
+            </React.Fragment>
+          )}
         </div>
       )}
-      <Box className={classes.upperBezel} alignItems='center'  >
-        <Slider className={classes.sliderBox} 
-          initialSlide={0} cssEase={'ease-out'} useTransform={true} 
-          speed={100} fade={false} dots={false} infinite={false} arrows={true}
-          afterChange={onChangeSlide} onSwipe={onSwipe}  >
-          {renderSlides()}
-        </Slider>
-      </Box>
-      <Grid container justify='space-around' className={classes.recordControls} classes={{label: 'recordControls'}} >
-        <Grid >
-        {recText === "Record" ?
-          <RecButton onClick={handleRecordClick}/> :
-          <RecButtonOff onClick={handleRecordClick}/>
-          }
-        </Grid>
-        <Grid>
-          &nbsp;
-        {
-            recText === 'Record' ? 
-        <TinyDotBlue  /> :
-        <TinyDotRed  /> 
-        }
-          &nbsp;
-        </Grid>
-        <Grid>
-          {playPause === "Play" ?
-              <PlayButton disabled={playDisabled} onClick={handlePlayClick} style={{opacity: {opacityStyle}}} 
-              /> :
-              <PauseButton onClick={handlePlayClick} 
-              /> 
-          }
-        </Grid>
-      </Grid >
-    </div>
+    </ThemeProvider>
   );
+  
  }
