@@ -19,7 +19,8 @@ import Menu from '@mui/material/Menu';
 import MailIcon from '@material-ui/icons/Mail';
 import PersonIcon from '@mui/icons-material/Person';
 import LoginIcon from '@mui/icons-material/Login';
-import AnmLogin from './AnmLogin';
+import AnmLogin from './Login';
+import Login from './Login';
 import AnmProfile from './AnmProfile';
 import AnmSettings from './AnmSettings';
 import AnmHome from './AnmHome';
@@ -39,7 +40,8 @@ export default function MenuAppBar (props)  {
   const [anchorElMain, setAnchorElMain] = useState(null);
   const [isShowingBar, setShowingBar] = useState(false);
   const [whichPage, setWhichPage] = useState(<AnmHome />);
-  const [key, setKey] = useState(0);
+//  const [key, setKey] = useState(0);
+  const key = {};
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -58,56 +60,51 @@ export default function MenuAppBar (props)  {
   };
 
   const handleNotifications = () => {
-    console.log(<AnmNotifications />);
+    console.log(<AnmNotifications key={Date.now()} />);
   };
 
   const anmHome = () => {
-    setWhichPage(<AnmHome />);
+    setWhichPage(<AnmHome key={Date.now()} />);
     handleCloseMain();
 };
 
   const anmBook = () => {
-    setWhichPage(<AnmBook />);
+    setWhichPage(<AnmBook key={Date.now()} />);
     handleCloseMain();
 };
 
 const anmShop = () => {
-  setWhichPage(<AnmShop />);
+  setWhichPage(<AnmShop key={Date.now()} />);
   handleCloseMain();
 };
 
 const anmRecord = () => {
-  if (whichPage.type  === AnmRecord) {
-    setKey((prevKey) => prevKey + 1);
-    setWhichPage(<AnmRecord key={Date.now()} />);
-  } else {
-  setWhichPage(<AnmRecord key={key} />);
+  setWhichPage(<AnmRecord key={Date.now()} />);
   handleCloseMain();
-  }
 };
 
 const anmAbout = () => {
-  setWhichPage(<AnmAbout />);
+  setWhichPage(<AnmAbout key={Date.now()} />);
   handleCloseMain();
 };
 
 const anmLogin = () => {
-  setWhichPage(<AnmLogin />);
+  setWhichPage(<AnmLogin key={Date.now()} />);
   handleCloseMain();
 };
 
 const anmSettings = () => {
-  setWhichPage(<AnmSettings />);
+  setWhichPage(<AnmSettings key={Date.now()} />);
   handleCloseMain();
 };
 
 const anmProfile = () => {
-  setWhichPage(<AnmProfile />);
+  setWhichPage(<AnmProfile key={Date.now()} />);
   handleCloseMain();
 };
 
 const anmNotifications = () => {
-  setWhichPage(<AnmNotifications />);
+  setWhichPage(<AnmNotifications key={Date.now()} />);
   handleCloseMain();
 };
 
@@ -156,6 +153,7 @@ const showPage = () => {
                     onClose={handleCloseMain}
               >
                     <MenuItem onClick={anmHome}>Home</MenuItem>
+                    <MenuItem onClick={anmLogin}>Login</MenuItem>
                     <MenuItem onClick={anmShop}>Shop</MenuItem>
                     <MenuItem onClick={anmBook}>Book</MenuItem>
                     <MenuItem onClick={anmRecord}>Record</MenuItem>

@@ -1,21 +1,31 @@
-import React, { useState, useEffect } from "react";
+// AnmLogin
+import React, { useState, useEffect, useRef } from "react";
 import { makeStyles } from '@mui/styles';
-import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
-//import { createBreakpoints } from '@material-ui/core/styles';
-import { createTheme, responsiveFontSizes } from '@mui/material/styles';
-import { createBreakpoints } from '@mui/system';
-import { ThemeProvider } from '@material-ui/core/styles';
+import createBreakpoints from '@material-ui/core/styles/createBreakpoints';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { styled } from '@mui/system';
 
-import { TextareaAutosize } from '@mui/material';
+import  { Container, ImageList }  from '@mui/material';
 import { Typography } from '@mui/material';
-import { Grid, Box, Button, InputLabel, Input } from '@mui/material';
+import { Paper } from '@mui/material';
+import Grid from '@mui/material/Grid';
+import { Box } from '@mui/material';
 import Axios from "axios";
 import Spinner from './Spinner_ANM';
 
+//import { useReactMediaRecorder } from "react-media-recorder";
+import PlayButton from './PlayButton';
+import PlayIconDisabled from './PlayButtonDisabled';
+import PauseButton from './PauseButton';
+import CancelIcon from '@mui/icons-material/Cancel';
+import IconButton from '@mui/material/IconButton';
+
 import './App.css';
+import "./styles.css";
 
 const breakpoints = createBreakpoints({});
 
+//const theme = createTheme();
 const theme = createTheme({
   palette: {
     secondary: {
@@ -24,196 +34,214 @@ const theme = createTheme({
   }
 });
 
-const useStyles = makeStyles((theme) => ({
-  clickableLink: {
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: theme.palette.primary.main,
-      color: theme.palette.primary.contrastText,
+const StyledPaper = styled(Paper)({
+  backgroundColor: 'blue',
+});
+
+console.log('theme: ' + theme);
+
+export default function AnmLogin(props) {
+
+  console.log("props:" + props);
+
+  const useStyles = makeStyles((theme) => ({
+      appBar: {
+      paddingBottom: '15vw',
+      marginBottom: '10vw',
     },
-  },
-  centeredInput: {
-    backgroundColor: 'white',
-    padding: '10px',
-    borderRadius: '5px',
-    '& input': {
-      textAlign: 'center',
+    container: {
+      position: 'relative',
     },
-    '&::placeholder': {
-      textAlign: 'center',
+    paper: {
+      backgroundColor: 'blue',
     },
-  },
-  loginPanel: {
-    border: 'solid 3px #0ff',
-    borderRadius: '20px',
-    position: 'relative',
-    paddingTop: '0vh',
-    top: '60% !important',
-    left: '50%',
-    topMargin: '10vh',
-    transform: 'translateX(-50%) translateY(-50%)',
-    width: '60vw',
-    height: '60vw',
-    maxWidth: '400px',
-    maxHeight: '95%',
-    backgroundColor: '#B3E5FC',
-    color: 'white !important',
-    [breakpoints.up('xs')]: {
+    iconButton:{
+      position: 'absolute',
+      top: '-47% !important',
+      right: '-47% !important',
+      zIndex: 1,
+     },
+    upperBezel: {
+      border: 'solid 3px #0ff',
+      position: 'absolute',
+      zIndex: 1,
+      paddingTop: '0vh',
       top: '60% !important',
-      height: '52vh',
-      width: '45vh',
-      borderRadius: '20px',
-      borderColor: 'green',
-      backgroundColor: '#B3E5FC',
+      left: '50%',
+      topMargin: '10vh',
+      transform: 'translateX(-50%) translateY(-50%)',
+      width: '60vw',
+      height: '80vw',
+      maxHeight: '95%',
+      backgroundColor: 'blue',
+      color: 'blue !important',
+      [breakpoints.up('xs')]: {
+        top: '60% !important',
+        height: '52vh',
+        width: '45vh',
+        borderColor: 'green',
+      },
+      [breakpoints.up('sm')]: {
+        top: '60% !important',
+        height: '52vh',
+        width: '45vh',
+        borderColor: 'blue',
+      },
+      [breakpoints.up('md')]: {
+        top: '60% !important',
+        height: '52vh',
+        width: '45vh',
+        borderColor: 'red',
+      },
+      [breakpoints.up('lg')]: {
+        top: '60% !important',
+        height: '52vh',
+        width: '45vh',
+        borderColor: 'yellow',
+      },
+      [breakpoints.up('xl')]: {
+        top: '60% !important',
+        height: '52vh',
+        width: '45vh',
+        borderColor: 'orange',
+      },
     },
-    [breakpoints.up('sm')]: {
-      top: '60% !important',
-      height: '52vh',
-      width: '45vh',
-      borderRadius: '20px',
-      borderColor: 'blue',
-      backgroundColor: '#B3E5FC',
+      textAloneBox: {
+        backgroundColor: "blue",
+        position: 'relative',
+        fontSize: '1.2rem',
+        textAlign: 'left',
+        right: '45%',
+        left: '0%',
+        marginRight: '10px',
+        marginLeft: '10px',
+        bottom: '15%',
+        verticalAlign: 'top',
+        height: '30vh',
+        width: 'auto',
+        [breakpoints.up('xs')]: {
+          height: '0vh',
+          width: 'auto',
+        },
+        [breakpoints.up('sm')]: {
+          height: '0vh',
+          width: '40vh',
+        },
+        [breakpoints.up('md')]: {
+          height: '0vh',
+          width: '40vh',
+        },
+        [breakpoints.up('lg')]: {
+          height: '0vh',
+          width: '44vh',
+        },
+        [breakpoints.up('xl')]: {
+          height: '0vh',
+          width: '40vh',
+        },
+      },
+      textAlone: {
+      backgroundColor: 'white',
+      fontSize: '1.2rem',
+      textAlign: 'left',
+      position: 'relative',
+      whiteSpace: "pre-line",
+      verticalAlign: "bottom",
+      marginRight: '5px !important',
+      marginLeft: '5px !important',
+      right: '10%',
+      left: '5%',
+      bottom: '15%',
+      color: 'black',
     },
-    [breakpoints.up('md')]: {
-      top: '60% !important',
-      height: '52vh',
-      width: '45vh',
-      borderRadius: '20px',
-      borderColor: 'red',
-      backgroundColor: '#B3E5FC',
+    titleText: {
+      fontSize: '2rem',
+      position: 'absolute',
+      textAlign: "center",
+      whiteSpace: "pre-line",
+      verticalAlign: "top",
+      right: '10%',
+      left: '35%',
+      bottom: '90%',
+      color: 'black',
     },
-    [breakpoints.up('lg')]: {
-      top: '60% !important',
-      height: '52vh',
-      width: '45vh',
-      borderRadius: '20px',
-      borderColor: 'black',
-      backgroundColor: '#B3E5FC',
+    simple: {
+      position: 'relative', 
+      left: '20%',
+      verticalAlign: 'bottom',
+      alignItems: 'bottom',
+      color: 'blue',
     },
-    [breakpoints.up('xl')]: {
-      top: '60% !important',
-      height: '52vh',
-      width: '45vh',
-      borderRadius: '20px',
-      borderColor: 'orange',
-      backgroundColor: '#B3E5FC',
-    },
-  },
 }));
 
-export default function AnmLogin({ onClose }) {
-  const classes = useStyles();
+// grab URI, remove trailing '/' if needed
+var BaseURI = document.baseURI;
+if (! BaseURI.endsWith('/'))
+  {
+    BaseURI = BaseURI.concat('/');
+  }
+//  BaseURI.replace(/\/+$/, '');
 
-//  const [isComponentVisible, setComponentVisible] = useState(false);
+const [thisWidth, setThisWidth]= useState(window.outerWidth);
 
-  const handleSubmit = () => {
-    console.log('submit here');
-  };
+const classes=useStyles();
 
-  const handleCancel = () => {
-    console.log('cancel here');
-    onClose();
-  };
+const instance = Axios.create({
+  baseURL: window.location.href,
+  timeout: 10000,
+  headers: {'Access-Control-Allow-Origin': '*'},
+});
 
-  const handleLostPassword = () => {
-    console.log('lost pwd');
-  };
+const [showComponent, setShowComponent] = useState(true);
+const [maxWidth, setMaxWidth] = useState();
+const [maxHeight, setMaxHeight] = useState();
+const [portrait, setPortrait] = useState(false);
+const [isLoading, setIsLoading] = useState(false); // true for prod
 
-  const handleRegister = () => {
-    console.log('register');
-  };
+const [newSlide, setNewSlide] = useState(0);
+const [recText, setRecText] = useState("Record");
+const [recordState, setRecordState] = useState(true);
+const [isSpinning, setSpinning] = useState(false);
+const [tinyDotVisible, setTinyDotVisible] = useState(false);
+const [opacityStyle, setPlayOpacity] = useState(0.38);
+
+// test axios
+const j = Axios;
+// cb func 
 
   useEffect(() => {
+    setThisWidth(window.outerWidth)
     document.body.style.backgroundColor = "white";
+
   }, []);
 
-//  if (!isComponentVisible) {
-//    return null; // or any other component or null to hide the component
-//  }
 
+  function handleCancel() {
+    setShowComponent(false);
+//    console.log("record cancel");
+  };
+
+  //TODO - Fix the spinner, not spinning 
   return (
-    <div className="Login">
-      <Box className={classes.loginPanel} alignItems="center">
-        <div>
-          <h2 style={{ color: 'black' }}>Login</h2>
+    <ThemeProvider theme={theme}>
+      {showComponent && (
+        <div className="App">
+          {isLoading ? (
+            <div>
+              <Spinner />
+            </div>
+          ) : (
+            <React.Fragment>
+              <StyledPaper className={classes.upperBezel}  elevation={3} alignItems="center">                
+              <IconButton onClick={handleCancel}  className={classes.iconButton}>
+                  <CancelIcon />
+                </IconButton>
+              </StyledPaper >
+            </React.Fragment>
+          )}
         </div>
-        <Box marginBottom={2}>
-          <Input
-            id="username"
-            type="username"
-            required
-            placeholder="username"
-            className={classes.centeredInput}
-            sx={{
-              textAlign: { xs: 'center', sm: 'left' },
-            }}
-          />
-        </Box>
-        <Box marginBottom={2}>
-          <Input
-            id="password"
-            type="password"
-            required
-            placeholder="password"
-            className={classes.centeredInput}
-            sx={{
-              textAlign: { xs: 'center', sm: 'left' },
-            }}
-          />
-        </Box>
-        <Grid container direction="column" justify="space-between" alignItems="center" style={{ height: '100%' }}>
-          <Grid item>
-            <Grid container spacing={2} justify="center" style={{ marginTop: 'auto' }}>
-              <Grid item>
-                <Button variant="contained" color="primary" onClick={handleSubmit} sx={{
-                  width: { xs: '100%', sm: 'auto' },
-                  mb: 2,
-                  mr: { xs: 0, sm: 1 },
-                }}>
-                  Submit
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button variant="contained" color="primary" onClick={handleCancel} sx={{
-                  width: { xs: '100%', sm: 'auto' },
-                  mb: 2,
-                  mr: { xs: 0, sm: 1 },
-                }}>
-                  Cancel
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid item style={{ marginTop: '25px' }}>
-            <Typography
-              variant="body1"
-              color="darkorange"
-              onClick={handleLostPassword}
-              className={classes.clickableLink}
-              style={{ fontSize: '24px', color: '#FF4500' }}
-              sx={{
-                fontSize: { xs: '20px', sm: '24px' },
-              }}
-            >
-              forgot password?
-            </Typography>
-          </Grid>
-          <Grid item style={{ marginTop: '20px' }}>
-            <Typography
-              variant="body1"
-              color="darkorange"
-              onClick={handleRegister}
-              className={classes.clickableLink}
-              style={{ fontSize: '24px', color: '#FF4500' }}
-              sx={{
-                fontSize: { xs: '20px', sm: '24px' },
-              }}
-            >
-              register new account
-            </Typography>
-          </Grid>
-        </Grid>
-      </Box>
-    </div>
+      )}
+    </ThemeProvider>
   );
-}
+  
+ }
