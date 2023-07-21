@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Login() {
+export default function Logout() {
 
   const classes = useStyles();
   const [showComponent, setShowComponent] = useState(true);
@@ -46,14 +46,14 @@ export default function Login() {
     if (!username || !password) {
       alert("Please enter both username and password");
     }
-    AuthService.login(username.trim(), password.trim(), (error, data) =>{
+    AuthService.logout(username.trim(), password.trim(), (error, data) =>{
       if (error) {
         setIsLoggedIn(false);
         alert(error);
         // handle error here
       } else {
-        console.log("successful login", data);
-        setIsLoggedIn(true);
+        console.log("successful logout", data);
+        setIsLoggedIn(false);
       }
     });
     // Handle login logic here

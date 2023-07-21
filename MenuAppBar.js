@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from './AuthContext';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -19,8 +20,11 @@ import Menu from '@mui/material/Menu';
 import MailIcon from '@material-ui/icons/Mail';
 import PersonIcon from '@mui/icons-material/Person';
 import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
 import AnmLogin from './Login';
-import Login from './Login';
+import AnmLogout from './Logout';
+import SquareIcon from '@mui/icons-material/Square';
+
 import AnmProfile from './AnmProfile';
 import AnmSettings from './AnmSettings';
 import AnmHome from './AnmHome';
@@ -33,6 +37,8 @@ import AnmNotifications from './AnmNotifications';
 import './App.css';
 
 export default function MenuAppBar (props)  {
+
+  const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
   
   // auth default 'true' while developing only
   const [auth, setAuth] = useState(true);
@@ -93,6 +99,11 @@ const anmLogin = () => {
   handleCloseMain();
 };
 
+const anmLogout = () => {
+  setWhichPage(<AnmLogout key={Date.now()} />);
+  handleCloseMain();
+};
+
 const anmSettings = () => {
   setWhichPage(<AnmSettings key={Date.now()} />);
   handleCloseMain();
@@ -108,6 +119,11 @@ const anmNotifications = () => {
   handleCloseMain();
 };
 
+useEffect(() => {
+  console.log("set logged in status: ", isLoggedIn);
+}, [isLoggedIn]);
+
+
 const showPage = () => {
     //console.log('show page: ' + whichPage.type.name);
     return(
@@ -120,9 +136,9 @@ const showPage = () => {
     <Box sx={{ flexGrow: 1 }}>
       <div >
         <AppBar width='100%' position="static" 
-            className={ {isShowingBar} ? 'alert-shown' : 'alert-hidden'}
+            className={ isShowingBar ? 'alert-shown' : 'alert-hidden'}
                 >
-          <Toolbar>
+          <Toolbar sx={{zIndex: 1 }}>
             <IconButton
               size="large"
               edge="start"
@@ -162,16 +178,43 @@ const showPage = () => {
 
             {auth && (
               <div>
-                <IconButton
-                  size="large"
-                  aria-label="login user"
-                  aria-controls="menu-appbar"
-                  aria-haspopup="true"
-                  onClick={handleMenu}
-                  color="inherit"
-                >
-                  <LoginIcon onClick={anmLogin} />
-                </IconButton>
+{isLoggedIn ? (
+  <>
+    <IconButton
+      size="large"
+      aria-label="login user"
+      aria-controls="menu-appbar"
+      aria-haspopup="true"
+      onClick={handleMenu}
+      color="inherit"
+    >
+      <LogoutIcon onClick={anmLogout} />
+    </IconButton>
+    {/* Other icons for authenticated users */}
+  </>
+) : (
+  <>
+    <IconButton
+      size="large"
+      aria-label="login user"
+      aria-controls="menu-appbar"
+      aria-haspopup="true"
+      onClick={handleMenu}
+      color="inherit"
+    >
+      <SquareIcon
+        sx={{
+          color: '#ff0000', // Set the desired color for the circle icon
+          position: 'absolute',
+          zIndex: -1,
+          fontSize: '3rem',
+        }}
+      />
+      <LoginIcon onClick={anmLogin} />
+    </IconButton>
+    {/* Other icons for non-authenticated users */}
+  </>
+)}
                 <IconButton
                   size="large"
                   aria-label="account of current user"

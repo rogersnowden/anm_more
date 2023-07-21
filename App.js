@@ -1,7 +1,9 @@
 import React from "react";
+import { useState, useEffect } from 'react';
 import { makeStyles } from '@mui/styles';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import createBreakpoints from '@material-ui/core/styles/createBreakpoints';
+import { AuthContext, AuthProvider } from './AuthContext';
 import MenuAppBar from './MenuAppBar';
 
 import './App.css';
@@ -19,9 +21,9 @@ const theme = createTheme({
   }
 });
 
-console.log('theme: ' + theme);
-
 export default function App() {
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const useStyles = makeStyles((theme) => ({
       appBar: {
@@ -209,13 +211,14 @@ export default function App() {
     },
 }));
 
-
 const classes=useStyles();
 
   return (
     <ThemeProvider theme={theme}>
       <div className="App" >
+      <AuthProvider>
         <MenuAppBar className={classes.appBar} title={'ANM Main'} />
+      </AuthProvider>
       </div>
     </ThemeProvider>
   );
