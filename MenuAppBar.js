@@ -46,6 +46,14 @@ export default function MenuAppBar (props)  {
   const [anchorElMain, setAnchorElMain] = useState(null);
   const [isShowingBar, setShowingBar] = useState(false);
   const [whichPage, setWhichPage] = useState(<AnmHome />);
+
+  // setting icon open drop down menu of its own
+  const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
+
+  // messageCount comes from profile, after login. Dummy '2' for testing, remove later
+  const [messageCount, setMessageCount] = useState(2);
+//  const [messageCount, setMessageCount] = useState();
+
 //  const [key, setKey] = useState(0);
   const key = {};
 
@@ -63,6 +71,14 @@ export default function MenuAppBar (props)  {
 
   const handleCloseMain = () => {
     setAnchorElMain(null);
+  };
+
+  const handleSettingsMenuOpen = (event) => {
+    setSettingsMenuOpen(true);
+  };
+  
+  const handleSettingsMenuClose = () => {
+    setSettingsMenuOpen(false);
   };
 
   const handleNotifications = () => {
@@ -169,7 +185,15 @@ const showPage = () => {
                     onClose={handleCloseMain}
               >
                     <MenuItem onClick={anmHome}>Home</MenuItem>
+                    {isLoggedIn ? ( 
+                      <>
+                    <MenuItem onClick={anmLogout}>Logout</MenuItem>
+                    </>
+                    ) : (
+                      <>
                     <MenuItem onClick={anmLogin}>Login</MenuItem>
+                    </>
+                    )}
                     <MenuItem onClick={anmShop}>Shop</MenuItem>
                     <MenuItem onClick={anmBook}>Book</MenuItem>
                     <MenuItem onClick={anmRecord}>Record</MenuItem>
@@ -178,53 +202,63 @@ const showPage = () => {
 
             {auth && (
               <div>
-{isLoggedIn ? (
-  <>
-    <IconButton
-      size="large"
-      aria-label="login user"
-      aria-controls="menu-appbar"
-      aria-haspopup="true"
-      onClick={handleMenu}
-      color="inherit"
-    >
-      <LogoutIcon onClick={anmLogout} />
-    </IconButton>
-    {/* Other icons for authenticated users */}
-  </>
-) : (
-  <>
-    <IconButton
-      size="large"
-      aria-label="login user"
-      aria-controls="menu-appbar"
-      aria-haspopup="true"
-      onClick={handleMenu}
-      color="inherit"
-    >
-      <SquareIcon
-        sx={{
-          color: '#ff0000', // Set the desired color for the circle icon
-          position: 'absolute',
-          zIndex: -1,
-          fontSize: '3rem',
-        }}
-      />
-      <LoginIcon onClick={anmLogin} />
-    </IconButton>
-    {/* Other icons for non-authenticated users */}
-  </>
-)}
+            {isLoggedIn ? (
+              <>
                 <IconButton
                   size="large"
-                  aria-label="account of current user"
+                  aria-label="login user"
                   aria-controls="menu-appbar"
                   aria-haspopup="true"
                   onClick={handleMenu}
                   color="inherit"
                 >
-                  <SettingsIcon onClick={anmSettings} />
+                  <LogoutIcon onClick={anmLogout} />
                 </IconButton>
+                {/* Other icons for authenticated users */}
+                  </>
+                ) : (
+                  <>
+                <IconButton
+                  size="large"
+                  aria-label="login user"
+                  aria-controls="menu-appbar"
+                  aria-haspopup="true"
+                  onClick={handleMenu}
+                  color="inherit"
+                >
+                  <SquareIcon
+                    sx={{
+                      color: '#ff0000', // Set the desired color for the circle icon
+                      position: 'absolute',
+                      zIndex: -1,
+                      fontSize: '3rem',
+                    }}
+                  />
+                  <LoginIcon onClick={anmLogin} />
+                </IconButton>
+                {/* Other icons for non-authenticated users */}
+                    </>
+                  )}
+                <IconButton
+                  size="large"
+                  aria-label="account of current user"
+                  aria-controls="menu-appbar"
+                  aria-haspopup="true"
+                  onClick={handleSettingsMenuOpen}
+                  color="inherit"
+                  disabled={!isLoggedIn}
+                >
+                  <SettingsIcon />
+                </IconButton>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={settingsMenuOpen}
+                  onClose={handleSettingsMenuClose}
+                >
+                  <MenuItem onClick={anmSettings}>Settings</MenuItem>
+                  <MenuItem onClick={anmProfile}>Profile</MenuItem>
+                  {/* Add more MenuItems here */}
+                </Menu>
                 <IconButton
                   size="large"
                   aria-label="profile of current user"
@@ -232,12 +266,17 @@ const showPage = () => {
                   aria-haspopup="true"
                   onClick={handleMenu}
                   color="inherit"
+                  disabled={!isLoggedIn} 
                 >
-                  <PersonIcon onClick={anmProfile} />
+          <Badge
+            badgeContent={messageCount}
+            color='error'
+            anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+            style={{ visibility: isLoggedIn ? 'visible' : 'hidden' }}
+            > 
+              <PersonIcon onClick={anmProfile} />
+          </Badge>
                 </IconButton>
-                <Badge badgeContent={4} color='error' anchorOrigin={{horizontal: 'right', vertical: 'top'}}>
-                  <NotificationsIcon  onClick={anmNotifications} />
-                </Badge>
               </div>
             )}
           </Toolbar>

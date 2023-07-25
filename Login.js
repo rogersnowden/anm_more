@@ -54,9 +54,10 @@ export default function Login() {
       } else {
         console.log("successful login", data);
         setIsLoggedIn(true);
+        // now turn off the form, we are done
+        setShowComponent(false);
       }
     });
-    // Handle login logic here
   };
 
   function handleCancel() {

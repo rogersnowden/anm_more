@@ -41,11 +41,7 @@ export default function Logout() {
   const [password, setPassword] = useState('');
   const { isLoggedIn, setIsLoggedIn} = useContext(AuthContext);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    if (!username || !password) {
-      alert("Please enter both username and password");
-    }
+  const handleLogout = (event) => {
     AuthService.logout(username.trim(), password.trim(), (error, data) =>{
       if (error) {
         setIsLoggedIn(false);
@@ -53,67 +49,38 @@ export default function Logout() {
         // handle error here
       } else {
         console.log("successful logout", data);
+        // set state obj to 'know' login status
         setIsLoggedIn(false);
+        // close the form
+        setShowComponent(false);
       }
     });
-    // Handle login logic here
   };
 
   function handleCancel() {
+    // do nothing but close the form
     setShowComponent(false);
-//    console.log("record cancel");
-  };
-
-  const handleForgotPassword = (event) => {
-    event.preventDefault();
-    // Handle logic here
-  };
-
-  const handleRegister = (event) => {
-    event.preventDefault();
-    // Handle logic here
   };
 
   return (
       <div className={classes.root}>
         {showComponent && (
-        <form className={classes.form} onSubmit={handleSubmit}>
+        <form className={classes.form} >
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Typography color="black" variant="h5" align="center">
-              Login
+              Do you wish to log out?
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <TextField
-              className={classes.input}
-              label="Username"
-              variant="outlined"
-              fullWidth
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              className={classes.input}
-              label="Password"
-              variant="outlined"
-              type="password"
-              fullWidth
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </Grid>
-          <Grid item xs={12}>
             <div className={classes.buttonContainer}>
-              <Button
+              <Button onClick={handleLogout}
                 className={classes.button}
                 type="submit"
                 variant="contained"
                 color="primary"
               >
-                Login
+                Logout
               </Button>
               <Button onClick={handleCancel}
                 className={classes.button}
@@ -124,20 +91,6 @@ export default function Logout() {
                 Cancel
               </Button>
             </div>
-          </Grid>
-          <Grid item xs={12}>
-            <ButtonBase className={classes.link} onClick={handleForgotPassword}>
-              <Typography color="black" variant="body2" align="center">
-                Forgot Password?
-              </Typography>
-            </ButtonBase>
-          </Grid>
-          <Grid item xs={12}>
-            <ButtonBase className={classes.link} onClick={handleRegister}>
-              <Typography color="black" variant="body2" align="center">
-                Register new account
-              </Typography>
-            </ButtonBase>
           </Grid>
         </Grid>
       </form>
