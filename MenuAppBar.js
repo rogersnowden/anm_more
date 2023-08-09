@@ -29,6 +29,7 @@ import AnmProfile from './AnmProfile';
 import AnmSettings from './AnmSettings';
 import AnmHome from './AnmHome';
 import AnmAbout from './AnmAbout';
+import AnmRegister from './AnmRegister';
 import AnmBook from './AnmBook';
 import AnmRecord from './AnmRecord';
 import AnmShop from './AnmShop';
@@ -107,6 +108,11 @@ const anmRecord = () => {
 
 const anmAbout = () => {
   setWhichPage(<AnmAbout key={Date.now()} />);
+  handleCloseMain();
+};
+
+const anmRegister = () => {
+  setWhichPage(<AnmRegister key={Date.now()} />);
   handleCloseMain();
 };
 
@@ -198,6 +204,7 @@ const showPage = () => {
                     <MenuItem onClick={anmBook}>Book</MenuItem>
                     <MenuItem onClick={anmRecord}>Record</MenuItem>
                     <MenuItem onClick={anmAbout}>About</MenuItem>
+                    <MenuItem onClick={anmRegister}>Reg</MenuItem>
                   </Menu>
 
             {auth && (

@@ -5,6 +5,8 @@ import AuthService from "./services/auth.service";
 //import axios from "axios";
 import { makeStyles } from '@mui/styles';
 import { TextField, Button, ButtonBase, Grid, Typography } from '@mui/material';
+import ErrorMessage from './ErrorMessage';
+import AlertMessageDialog from './AlertMessage';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -40,6 +42,8 @@ export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const { isLoggedIn, setIsLoggedIn} = useContext(AuthContext);
+  const [message, setMessage] = useState('');
+  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -49,8 +53,9 @@ export default function Login() {
     AuthService.login(username.trim(), password.trim(), (error, data) =>{
       if (error) {
         setIsLoggedIn(false);
-        alert(error);
-        // handle error here
+        setMessage("Username / Password not valid");
+        setMessageDialogOpen(true);
+  // handle error here
       } else {
         console.log("successful login", data);
         setIsLoggedIn(true);
@@ -143,6 +148,11 @@ export default function Login() {
         </Grid>
       </form>
         )}
+      <AlertMessageDialog 
+        open={messageDialogOpen}
+        onClose={() => setMessageDialogOpen(false)}
+        message= {message}
+      />      
     </div>
   );
 }

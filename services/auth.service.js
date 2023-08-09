@@ -61,16 +61,29 @@ class AuthService {
   
 
 
-  register(username, firstname, lastname, email, password) {
-    return axiosInstance.post(API_URL + "register", {
-      username,
-      firstname,
-      lastname,
-      email,
-      password,
-
-    });
-  }
+    register(username, firstname, lastname, email, password) {
+      return axiosInstance
+        .post(API_URL + "register", {
+          username,
+          firstname,
+          lastname,
+          email,
+          password,
+        })
+        .then((response) => {
+          // The user was registered successfully
+          return response.data;
+        })
+        .catch((error) => {
+          // Check if the error status is 409 Conflict (user already exists)
+          if (error.response && error.response.status === 409) {
+            throw new Error("User already exists"); // Throw the error to be caught in the component
+          } else {
+            throw new Error("Registration failed"); // Or handle other error cases if needed
+          }
+        });
+    }
+  
 
   getprofile(username) {
     let thisthing = document.cookie;
