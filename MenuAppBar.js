@@ -30,6 +30,7 @@ import AnmSettings from './AnmSettings';
 import AnmHome from './AnmHome';
 import AnmAbout from './AnmAbout';
 import AnmRegister from './AnmRegister';
+import AnmPasswordRecover from './AnmPasswordRecover';
 import AnmBook from './AnmBook';
 import AnmRecord from './AnmRecord';
 import AnmShop from './AnmShop';
@@ -47,6 +48,7 @@ export default function MenuAppBar (props)  {
   const [anchorElMain, setAnchorElMain] = useState(null);
   const [isShowingBar, setShowingBar] = useState(false);
   const [whichPage, setWhichPage] = useState(<AnmHome />);
+  const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
 
   // setting icon open drop down menu of its own
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
@@ -112,7 +114,13 @@ const anmAbout = () => {
 };
 
 const anmRegister = () => {
-  setWhichPage(<AnmRegister key={Date.now()} />);
+  //setWhichPage(<AnmRegister key={Date.now()} />);
+  setRegisterDialogOpen(true);
+  handleCloseMain();
+};
+
+const anmPasswordRecover = () => {
+  setWhichPage(<AnmPasswordRecover key={Date.now()} />);
   handleCloseMain();
 };
 
@@ -205,6 +213,7 @@ const showPage = () => {
                     <MenuItem onClick={anmRecord}>Record</MenuItem>
                     <MenuItem onClick={anmAbout}>About</MenuItem>
                     <MenuItem onClick={anmRegister}>Reg</MenuItem>
+                    <MenuItem onClick={anmPasswordRecover}>Reco</MenuItem>
                   </Menu>
 
             {auth && (
@@ -289,6 +298,11 @@ const showPage = () => {
           </Toolbar>
         </AppBar>
         {showPage()}
+        {registerDialogOpen && (
+        <AnmRegister
+          onClose={() => setRegisterDialogOpen(false)}
+        />
+        )}
       </div>
     </Box>
   );

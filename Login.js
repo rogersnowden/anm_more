@@ -6,7 +6,10 @@ import AuthService from "./services/auth.service";
 import { makeStyles } from '@mui/styles';
 import { TextField, Button, ButtonBase, Grid, Typography } from '@mui/material';
 import ErrorMessage from './ErrorMessage';
+import AnmPasswordRecover from './AnmPasswordRecover';
+import AnmRegister from './AnmRegister';
 import AlertMessageDialog from './AlertMessage';
+import Overlay from './Overlay';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -14,12 +17,14 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
     alignItems: 'center',
     height: '100vh',
+    zIndex: 9997,
   },
   form: {
     width: '300px',
     padding: theme.spacing(2),
     borderRadius: theme.spacing(1),
     backgroundColor: '#ADD1F5',
+    zIndex: 9997,
   },
   input: {
     backgroundColor: 'white',
@@ -44,6 +49,8 @@ export default function Login() {
   const { isLoggedIn, setIsLoggedIn} = useContext(AuthContext);
   const [message, setMessage] = useState('');
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  const [passwordRecoverOpen, setPasswordRecoverOpen] = useState(false);
+  const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -71,13 +78,18 @@ export default function Login() {
   };
 
   const handleForgotPassword = (event) => {
-    event.preventDefault();
+    event.preventDefault(); 
+    setPasswordRecoverOpen(true);
     // Handle logic here
   };
 
   const handleRegister = (event) => {
-    event.preventDefault();
-    // Handle logic here
+//    event.preventDefault();
+    setRegisterDialogOpen(true);
+  };
+
+  const closeRegisterDialog = () => {
+    setRegisterDialogOpen(false);
   };
 
   return (
@@ -152,7 +164,22 @@ export default function Login() {
         open={messageDialogOpen}
         onClose={() => setMessageDialogOpen(false)}
         message= {message}
-      />      
+      />
+      <div>
+        <Overlay show={passwordRecoverOpen} />
+        <AnmPasswordRecover
+          open={passwordRecoverOpen}
+          onClose={() => setPasswordRecoverOpen(false)}
+        /> 
+      </div>  
+      {
+        registerDialogOpen && (
+          <>
+          <Overlay show={registerDialogOpen} />
+          <AnmRegister onClose={() => setRegisterDialogOpen(false)} />
+          </>
+        )
+      }
     </div>
   );
 }

@@ -3,7 +3,6 @@ import { AuthContext } from './AuthContext';
 import ErrorMessage from './ErrorMessage';
 //import ExistingUserDialogue from './ExistingUserDialogue';
 import AlertMessageDialog from './AlertMessage';
-import Overlay from './Overlay';
 
 import AuthService from "./services/auth.service";
 //import axios from "axios";
@@ -16,20 +15,12 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
     alignItems: 'center',
     height: '100vh',
-    position: 'fixed',
-    top: '10%',
-    left: '35%',
-    zIndex: 9999,
   },
   form: {
     width: '300px',
     padding: theme.spacing(2),
     borderRadius: theme.spacing(1),
     backgroundColor: '#ADD1F5',
-
-  },
-  overlayForm: {
-    zIndex: 9998,
   },
   input: {
     backgroundColor: 'white',
@@ -49,8 +40,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AnmRegister(props) {
-console.log('props: ' + props);
+export default function AnmRegister() {
+
   const classes = useStyles();
 
   // state stuff here
@@ -144,7 +135,6 @@ console.log('props: ' + props);
 
   function handleCancel() {
     setShowComponent(false);
-    props.onClose && props.onClose();
 //    console.log("record cancel");
   };
 
