@@ -28,7 +28,6 @@ class AuthService {
         'Access-Control-Allow-Origin': 'https://localhost:3000'
       }
     };
-
     axios(requestOptions)
       .then(response => {
         if (response.data) {
@@ -59,9 +58,34 @@ class AuthService {
         });
     }
   
-
-
-    register(username, firstname, lastname, email, password) {
+    pwdreset(username, callback) {
+      console.log('url: ' + API_URL + "pwdreset");
+      const requestOptions = {
+        method: 'POST',
+        url: API_URL + 'pwdreset',
+        data: {
+          username: username,
+        },
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': 'https://localhost:3000'
+        }
+        };
+      axios(requestOptions)
+        .then(response => {
+          if (response.data) {
+            var thisCookie = 'accessToken=' + response.data.accessToken;
+            document.cookie = thisCookie;
+          }
+          callback(null, response.data);
+        })
+        .catch(error => {
+          callback(error, null);
+        });
+      }
+    
+      register(username, firstname, lastname, email, password) {
       return axiosInstance
         .post(API_URL + "register", {
           username,
