@@ -13,7 +13,7 @@ console.log("cookie: " + cookie);
 
 class AuthService {
 
-  login(username, password, callback) {
+  login(token, username, password, callback) {
     console.log('url: ' + API_URL + "login");
     const requestOptions = {
       method: 'POST',
@@ -84,8 +84,38 @@ class AuthService {
           callback(error, null);
         });
       }
-    
-      register(username, firstname, lastname, email, password) {
+
+      // set new password
+      pwdset(token, username, password, callback) {
+        console.log('url: ' + API_URL + "pwdset");
+        const requestOptions = {
+          method: 'POST',
+          url: API_URL + 'pwdset',
+          data: {
+            token: token,
+            username: username,
+            password: password,
+          },
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': 'https://localhost:3000'
+          }
+          };
+        axios(requestOptions)
+          .then(response => {
+            if (response.data) {
+              var thisCookie = 'accessToken=' + response.data.accessToken;
+              document.cookie = thisCookie;
+            }
+            callback(null, response.data);
+          })
+          .catch(error => {
+            callback(error, null);
+          });
+        }
+      
+        register(username, firstname, lastname, email, password) {
       return axiosInstance
         .post(API_URL + "register", {
           username,

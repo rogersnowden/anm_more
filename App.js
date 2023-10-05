@@ -1,10 +1,12 @@
 import React from "react";
 import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import createBreakpoints from '@material-ui/core/styles/createBreakpoints';
 import { AuthContext, AuthProvider } from './AuthContext';
 import MenuAppBar from './MenuAppBar';
+import PwdSet from './PwdSet';
 
 import './App.css';
 import "slick-carousel/slick/slick.css";
@@ -213,13 +215,19 @@ export default function App() {
 
 const classes=useStyles();
 
-  return (
-    <ThemeProvider theme={theme}>
-      <div className="App" >
+return (
+  <ThemeProvider theme={theme}>
+    <div className="App">
       <AuthProvider>
-        <MenuAppBar className={classes.appBar} title={'ANM Main'} />
+        <Router>
+          <MenuAppBar className={classes.appBar} title={'ANM Main'} />
+          <Routes>
+            <Route path="/pwdset/:token" element={<PwdSet />} />
+            {/* Other routes can be added similarly here */}
+          </Routes>
+        </Router>
       </AuthProvider>
-      </div>
-    </ThemeProvider>
-  );
+    </div>
+  </ThemeProvider>
+);
 }

@@ -76,35 +76,35 @@ export default function AnmPasswordRecover({ open, onClose }) {
     });
   };
 
-  const handleMouseDown = (event) => {
-    const formRect = formRef.current.getBoundingClientRect();
-    const offsetX = event.clientX - formRect.left;
-    const offsetY = event.clientY - formRect.top;
-    
-    setIsDragging(true);
-    setInitialMousePosition({ x: event.clientX, y: event.clientY });
-    setPosition({ x: offsetX, y: offsetY });
-  };
+//  const handleMouseDown = (event) => {
+//    const formRect = formRef.current.getBoundingClientRect();
+//    const offsetX = event.clientX - formRect.left;
+//    const offsetY = event.clientY - formRect.top;
+//    
+//    setIsDragging(true);
+//    setInitialMousePosition({ x: event.clientX, y: event.clientY });
+//    setPosition({ x: offsetX, y: offsetY });
+//  };
  
   
-  const handleMouseMove = (event) => {
-    if (isDragging) {
-      setPosition({
-        x: event.nativeEvent.offsetX - position.x,
-        y: event.nativeEvent.offsetY - position.y,
-      });
-    }
-  };
+  //const handleMouseMove = (event) => {
+  //  if (isDragging) {
+  //    setPosition({
+  //      x: event.nativeEvent.offsetX - position.x,
+  //      y: event.nativeEvent.offsetY - position.y,
+  //    });
+  //  }
+  //};
 
-  const handleMouseUp = (event) => {
-    if (initialMousePosition.x === event.clientX && initialMousePosition.y === event.clientY) {
-      // This means the mouse hasn't moved between mousedown and mouseup events, so we shouldn't close the form.
-      setIsDragging(false);
-      } else {
-          setIsDragging(false);
-          onClose();
-      }
-  };
+  //const handleMouseUp = (event) => {
+  //  if (initialMousePosition.x === event.clientX && initialMousePosition.y === event.clientY) {
+  //    // This means the mouse hasn't moved between mousedown and mouseup events, so we shouldn't close the form.
+  //    setIsDragging(false);
+  //    } else {
+  //        setIsDragging(false);
+  //        onClose();
+  //    }
+  //};
  
   //useEffect(() => {
   //  if (isDragging) {
@@ -130,8 +130,7 @@ export default function AnmPasswordRecover({ open, onClose }) {
         {open && (
             <div className={classes.form} ref={formRef}>
                 <div // This div serves as the title bar or drag handle
-                    style={{ cursor: isDragging ? 'grabbing' : 'grab', backgroundColor: 'lightgray', padding: '10px' }}
-                    onMouseDown={handleMouseDown}
+                    style={{ padding: '10px' }}
                 >
                     <Typography color="black" variant="h5" align="center">
                         Reset Password
