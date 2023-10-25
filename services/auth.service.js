@@ -13,7 +13,7 @@ console.log("cookie: " + cookie);
 
 class AuthService {
 
-  login(token, username, password, callback) {
+  login(username, password, callback) {
     console.log('url: ' + API_URL + "login");
     const requestOptions = {
       method: 'POST',
