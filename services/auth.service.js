@@ -140,7 +140,6 @@ class AuthService {
   
 
   getprofile(username) {
-    let thisthing = document.cookie;
     console.log("API_URL: " + API_URL);
     var result = axios
     .post(API_URL + "getprofile",  {

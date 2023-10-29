@@ -6,6 +6,7 @@ import AuthService from "./services/auth.service";
 import { makeStyles } from '@mui/styles';
 import { TextField, Button, ButtonBase, Grid, Typography } from '@mui/material';
 import ErrorMessage from './ErrorMessage';
+import AnmStyledAlert from './AnmStyledAlert';
 import AnmPasswordRecover from './AnmPasswordRecover';
 import AnmRegister from './AnmRegister';
 import AlertMessageDialog from './AlertMessage';
@@ -31,11 +32,6 @@ const useStyles = makeStyles((theme) => ({
   input: {
     backgroundColor: 'white',
     marginBottom: theme.spacing(2),
-  },
-  // make sure dialog is always on top
-  dialog: {
-    zIndex: '10000 !important',
-    position: 'relative !important',
   },
   buttonContainer: {
     display: 'flex',
@@ -171,12 +167,14 @@ export default function Login() {
           </div>
         </form>
       )}
-      <AlertMessageDialog
-        className={classes.dialog}
-        open={messageDialogOpen}
-        onClose={() => setMessageDialogOpen(false)}
-        message={message}
-      />
+      <div>
+        <Overlay show={messageDialogOpen} />
+        <AnmStyledAlert
+          open={messageDialogOpen}
+          onClose={() => setMessageDialogOpen(false)}
+          alertMessage={message}
+        />
+      </div>
       <div>
         <Overlay show={passwordRecoverOpen} />
         <AnmPasswordRecover

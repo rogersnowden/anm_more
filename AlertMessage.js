@@ -16,6 +16,8 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: theme.spacing(1), // Customize the corner shape
     backgroundColor: '#cee0f2',
     boxShadow: theme.shadows[5], // Add a shadow effect  
+    position: 'relative',
+    zIndex: '10000 !important',
     },
   container: {
     backgroundColor: '#cee0f2', // Set background color for the entire container
@@ -56,7 +58,7 @@ const AlertMessageDialog = ({ open, onClose, message }) => {
   const classes = useStyles();
 
   return (
-    <Dialog open={open} onClose={onClose} className={classes.globalBoxSizing}>
+    <Dialog open={open} onClose={onClose} className={`${classes.globalBoxSizing} ${classes.anotherClass}`}>
       <div className={classes.container}>
         <p className={classes.message}>{message}</p>
         <DialogActions className={classes.buttonContainer}>
