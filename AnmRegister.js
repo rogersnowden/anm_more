@@ -1,9 +1,11 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from './AuthContext';
 import ErrorMessage from './ErrorMessage';
 //import ExistingUserDialogue from './ExistingUserDialogue';
-import AlertMessageDialog from './AlertMessage';
-import Overlay from './Overlay';
+//import AlertMessageDialog from './AlertMessage';
+import AnmStyledAlert from './AnmStyledAlert';
+
+//import Overlay from './Overlay';
 
 import AuthService from "./services/auth.service";
 //import axios from "axios";
@@ -49,8 +51,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AnmRegister(props) {
-console.log('props: ' + props);
+export default function AnmRegister({onClose, onRegistrationSuccess}) {
   const classes = useStyles();
 
   // state stuff here
@@ -68,10 +69,22 @@ console.log('props: ' + props);
 
   const [phoneError, setPhoneError] = useState('');
   const [errormessage, setErrormessage] = useState();
+  // this controls alert dismissal, success/failure
+  const [isSuccessAlert, setIsSuccessAlert] = useState(false);
   const [message, setMessage] = useState('');
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  const [overlayOpen, setOverlayOpen] = useState(false);
   const { isLoggedIn, setIsLoggedIn} = useContext(AuthContext);
   const [existingUserDialogueOpen, setExistingUserDialogueOpen] = useState(false);
+
+  //debug code for overlay handling diag
+  useEffect(() => {
+    console.log("Comp updated. Overlay open: ", overlayOpen);
+    return() => {
+      console.log("Component unmounting");
+    };
+  }, [overlayOpen]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -99,11 +112,16 @@ console.log('props: ' + props);
       )
         .then((data) => {
           console.log("successful registration", data);
-          setIsLoggedIn(true);
-          setShowComponent(false);
+          setIsLoggedIn(false);//seems odd, but need to login again
+          setMessage("New Registration successful, please log in");
+          setMessageDialogOpen(true);
+          setOverlayOpen(true);
+          setShowComponent(false); // after popup dismissed, dismiss 'this'
+          setIsSuccessAlert(true);
         })
         .catch((error) => {
           setIsLoggedIn(false);
+          setIsSuccessAlert(false);
 
           // Check if the error message is "User already exists"
           if (error.message === 'User already exists') {
@@ -111,13 +129,24 @@ console.log('props: ' + props);
 //            setExistingUserDialogueOpen(true);
               setMessage("User Already Exists");
               setMessageDialogOpen(true);
+              setOverlayOpen(true);
           } else {
             // Handle other error cases if needed
-            setErrormessage(error.message);
+            setMessage(error.message);
+            setMessageDialogOpen(true);
+            setOverlayOpen(true);
           }
         });
     }
   };
+
+  const closeAlert = () => {
+//    setOverlayOpen(false);
+    if (isSuccessAlert) {
+      onRegistrationSuccess();
+    }
+    setMessageDialogOpen(false);
+  }
 
   const validateForm = (data) => {
     const errors = {};
@@ -144,7 +173,7 @@ console.log('props: ' + props);
 
   function handleCancel() {
     setShowComponent(false);
-    props.onClose && props.onClose();
+    onClose();
 //    console.log("record cancel");
   };
 
@@ -274,11 +303,13 @@ console.log('props: ' + props);
           </Grid>
         </form>
       )}
-      <AlertMessageDialog 
-        open={messageDialogOpen}
-        onClose={() => setMessageDialogOpen(false)}
-        message= {message}
-      />      
+      <div>
+        <AnmStyledAlert
+          open={messageDialogOpen}
+          onClose={closeAlert}
+          alertMessage={message}
+        />
+      </div>
     </div>
   );
 }

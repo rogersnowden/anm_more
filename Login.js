@@ -185,7 +185,10 @@ export default function Login() {
       {registerDialogOpen && (
         <>
           <Overlay show={registerDialogOpen} />
-          <AnmRegister onClose={() => setRegisterDialogOpen(false)} />
+          <AnmRegister 
+            onClose={() => setRegisterDialogOpen(false)} 
+            onRegistrationSuccess={() => setRegisterDialogOpen(false)}
+          />
         </>
       )}
     </div>
