@@ -1,0 +1,101 @@
+To store additional user information such as firstname, username, and the roles array, you can modify your AuthContext to include these details. This approach will allow you to access not only the login status (isLoggedIn) but also other user-specific data across your application.
+Step 1: Modify the AuthContext
+
+First, you will need to expand the AuthContext to hold more than just the isLoggedIn state. You can create an object that includes all necessary user information.
+
+// AuthContext.js
+import React from 'react';
+
+const AuthContext = React.createContext({
+  isLoggedIn: false,
+  user: null, // This will hold additional user info
+  setIsLoggedIn: () => {},
+  setUser: () => {} // Function to update the user info
+});
+
+export default AuthContext;
+
+
+Step 2: Update the Context Provider in App.js
+
+In App.js, manage the state for both isLoggedIn and user, and provide functions to update these states.
+
+// App.js
+import React, { useState } from 'react';
+import AuthContext from './AuthContext';
+import MenuAppBar from './MenuAppBar';
+// other imports
+
+function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
+
+  return (
+    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, user, setUser }}>
+      <MenuAppBar />
+      {/* other components */}
+    </AuthContext.Provider>
+  );
+}
+
+export default App;
+
+
+Step 3: Update the Login Component to Set User Information
+
+In your Login.js component, when the login is successful, update the context with the additional user data received from the server.
+
+// Login.js
+// ...imports
+
+export default function Login() {
+  // ...existing states
+
+  const { setIsLoggedIn, setUser } = useContext(AuthContext);
+
+  const handleSubmit = (event) => {
+    // ...existing logic
+
+    AuthService.login(username.trim(), password.trim(), (error, data) => {
+      if (error) {
+        // ...existing error handling
+      } else {
+        console.log("successful login", data);
+        setIsLoggedIn(true);
+        setUser({
+          username: data.username,
+          firstname: data.firstname,
+          roles: data.roles
+        });
+        setShowComponent(false);
+      }
+    });
+  };
+
+  // ...rest of the component
+}
+
+
+Step 4: Access User Information in Other Components
+
+Now, in any component where you need to access the user information, you can use the useContext hook to retrieve it from the AuthContext.
+
+// SomeOtherComponent.js
+import React, { useContext } from 'react';
+import AuthContext from './AuthContext';
+
+function SomeOtherComponent() {
+  const { user } = useContext(AuthContext);
+
+  // Now you can access user.username, user.firstname, and user.roles
+  // ...
+
+  return (
+    // JSX
+  );
+}
+
+export default SomeOtherComponent;
+
+
+By following these steps, you'll be able to store and access additional user information such as firstname, username, and roles anywhere in your application through the AuthContext. This is a flexible and scalable way to manage user states and information in a React application.

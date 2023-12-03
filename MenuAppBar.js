@@ -284,14 +284,14 @@ const showPage = () => {
                   color="inherit"
                   disabled={!isLoggedIn} 
                 >
-          <Badge
-            badgeContent={messageCount}
-            color='error'
-            anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
-            style={{ visibility: isLoggedIn ? 'visible' : 'hidden' }}
-            > 
-              <PersonIcon onClick={anmProfile} />
-          </Badge>
+                  <Badge
+                    badgeContent={messageCount}
+                    color='error'
+                    anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+                    style={{ visibility: isLoggedIn ? 'visible' : 'hidden' }}
+                    > 
+                      <PersonIcon onClick={anmProfile} />
+                  </Badge>
                 </IconButton>
               </div>
             )}

@@ -1,0 +1,56 @@
+import { createContext, useState } from 'react';
+
+const AuthContext = createContext();
+
+const AuthProvider = ({ children }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  return (
+    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export { AuthContext, AuthProvider };
+
+Your existing AuthContext and AuthProvider are set up to provide a simple context for authentication status across your React application. It's a common pattern in React to manage global states like user authentication. Let's break down what each part does and how it compares to the expanded context I suggested:
+
+    AuthContext Creation:
+        const AuthContext = createContext(); creates a new context object. When React renders a component that subscribes to this context, it will read the current context value from the nearest matching Provider above it in the tree.
+
+    AuthProvider Component:
+        This component is a functional component that uses the useState hook to create a state and a function to update it (isLoggedIn and setIsLoggedIn).
+        AuthProvider wraps its children with AuthContext.Provider and provides the current state as its value.
+        Any child component in the component tree that needs access to this state can use the useContext hook with AuthContext to subscribe to these values.
+
+    Differences From the Expanded Context:
+        Your current implementation only manages the login state (isLoggedIn and setIsLoggedIn).
+        The expanded context I suggested includes an additional state for user information (user and setUser). This allows not only tracking whether the user is logged in but also storing and accessing additional user data (like username, firstname, roles, etc.).
+
+To integrate additional user information into your existing context, you can modify the AuthProvider as follows:
+
+import { createContext, useState } from 'react';
+
+const AuthContext = createContext();
+
+const AuthProvider = ({ children }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null); // Added state for user details
+
+  return (
+    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, user, setUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export { AuthContext, AuthProvider };
+
+In this modified version:
+
+    The user state holds the user's information (like username, firstname, roles).
+    The setUser function is used to update this information.
+    Both user and setUser are provided through the context, so any component in your application can access and modify the user's information.
+
+This modification will allow your application to manage not only whether the user is logged in but also store and distribute the user's related data throughout the component tree.

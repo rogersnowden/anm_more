@@ -115,14 +115,14 @@ class AuthService {
           });
         }
       
-        register(username, firstname, lastname, email, password) {
+    register(username, password, firstname, lastname, phonenumber) {
       return axiosInstance
-        .post(API_URL + "register", {
+      .post(API_URL + "register", {
           username,
+          password,
           firstname,
           lastname,
-          email,
-          password,
+          phonenumber,
         })
         .then((response) => {
           // The user was registered successfully
