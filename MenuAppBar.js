@@ -40,8 +40,10 @@ import './App.css';
 
 export default function MenuAppBar (props)  {
 
+  const { firstName, setFirstName } = useContext(AuthContext);
+  const { isVerified, setIsVerified } = useContext(AuthContext);
   const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
-  
+  const { ownsProduct, setOwnsProduct } = useContext(AuthContext);
   // auth default 'true' while developing only
   const [auth, setAuth] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -168,7 +170,7 @@ const showPage = () => {
         <AppBar width='100%' position="static" 
             className={ isShowingBar ? 'alert-shown' : 'alert-hidden'}
                 >
-          <Toolbar sx={{zIndex: 1 }}>
+          <Toolbar sx={{zIndex: 1, display: 'flex', alignItems: 'center' }}>
             <IconButton
               size="large"
               edge="start"
@@ -183,6 +185,11 @@ const showPage = () => {
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                 ANM
             </Typography>
+            {isLoggedIn && (
+              <Typography variant="body1" sx={{ mr: 2 }}>
+                {firstName}
+              </Typography>
+            )}
             <Menu
                     id="menu-appbar-hamburger"
                     anchorEl={anchorElMain}

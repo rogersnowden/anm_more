@@ -50,6 +50,10 @@ export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const { isLoggedIn, setIsLoggedIn} = useContext(AuthContext);
+  const { firstName, setFirstName } = useContext(AuthContext);
+  const { isVerified, setIsVerified } = useContext(AuthContext);
+  const { ownsProduct, setOwnsProduct } = useContext(AuthContext);
+  const { roles, setRoles} = useContext(AuthContext);
   const [message, setMessage] = useState('');
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [passwordRecoverOpen, setPasswordRecoverOpen] = useState(false);
@@ -69,6 +73,9 @@ export default function Login() {
       } else {
         console.log("successful login", data);
         setIsLoggedIn(true);
+        setFirstName(data.firstname);
+        setIsVerified(data.isverified)
+        setOwnsProduct(data.ownsproduct);
         // now turn off the form, we are done
         setShowComponent(false);
       }
