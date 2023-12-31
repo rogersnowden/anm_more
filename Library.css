@@ -1,0 +1,16 @@
+/* Library.css */
+.library-container {
+    margin-top: 20px; /* Adjust as needed for spacing below MenuAppBar */
+    padding: 10px;
+}
+
+.library-item {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.library-item:hover {
+    background-color: #f0f0f0;
+}

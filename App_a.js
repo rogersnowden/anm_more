@@ -1,38 +1,23 @@
-import React, { useState, useEffect, useRef } from "react";
-// import { makeStyles } from '@material-ui/core/styles';
+import React from "react";
+import { useState, useEffect, useContext } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import createBreakpoints from '@material-ui/core/styles/createBreakpoints';
-//import { createTheme, ThemeProvider } from '@material-ui/core/styles';
+import { AuthContext, AuthProvider } from './AuthContext';
 import MenuAppBar from './MenuAppBar';
-
-import Slider from "react-slick";
-
-import  { Container, ImageList }  from '@mui/material';
-import { TextareaAutosize } from '@mui/material';
-import { Typography } from '@mui/material';
-import { Box } from '@mui/material';
-import Axios from "axios";
-import Spinner from './Spinner_ANM';
-import spinnerGif from './spinner.gif';
+import LibraryLoader from './LibraryLoader';
+import PwdSet from './PwdSet';
+import Library from './Library';
+import ProdService from "./services/prod.service";
 
 import './App.css';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./styles.css";
 
-//CORS middleware
-var corsMiddleware = function(req, res, next) {
-  res.header('Access-Control-Allow-Origin', 'localhost:27107'); //replace localhost with actual host
-  res.header('Access-Control-Allow-Methods', 'OPTIONS, GET, PUT, PATCH, POST, DELETE');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, Authorization');
-
-  next();
-}
-
 const breakpoints = createBreakpoints({});
 
-//const theme = createTheme();
 const theme = createTheme({
   palette: {
     secondary: {
@@ -41,9 +26,12 @@ const theme = createTheme({
   }
 });
 
-console.log('theme: ' + theme);
-
 export default function App() {
+
+  const { isLoggedIn, userName } = useContext(AuthContext);
+  const [message, setMessage] = useState('');
+  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  const [libraryItems, setLibraryItems] = useState('');
 
   const useStyles = makeStyles((theme) => ({
       appBar: {
@@ -231,231 +219,20 @@ export default function App() {
     },
 }));
 
-
-const [thisWidth, setThisWidth]= useState(window.outerWidth);
-
 const classes=useStyles();
 
-const [imgURLArray, setImgURLArray] = useState();
-const [bookTextArray, setBookTextArray] = useState();
-const [pageTextColorArray, setPageTextColorArray] = useState();
-const [bookTitle, setBookTitle] = useState('My Book');
-const imgArray = [];
-const pageText = [];
-const [imgListSize, setImgListSize]  = useState(0);
-const [maxWidth, setMaxWidth] = useState();
-const [maxHeight, setMaxHeight] = useState();
-const [leftDisabled, setLeftDisabled] = useState(true);
-const [rightDisabled, setRightDisabled] = useState(false);
-const [currentPageImage, setCurrentPageImage]  = useState();
-const [currentPageText, setCurrentPageText] = useState();
-const [currentPageTextColor, setCurrentPageTextColor] = useState();
-const [currentPageIndex, setCurrentPageIndex]= useState(0);
-const [portrait, setPortrait] = useState(false);
-const [isLoading, setIsLoading] = useState(true);
-const [bookSetJSON, setBookSetJSON] = useState();
-const [doHicky, setDoHicky] = useState();
-
-const [indexVal, setIndexVal] = useState(0);
-
-const [newSlide, setNewSlide] = useState(0);
-
-const onChangeSlide = (newSlide)  => {
-  setCurrentPageText(bookTextArray[newSlide]);
-  setIndexVal(newSlide);
-  setNewSlide(newSlide);
-  console.log("new slide: " + newSlide);
-  };
-
-const onSwipe = (props) => {
-  console.log('swiped');
-};
-
-  function cacheImages(imgURLArray) {
-    if (imgURLArray){
-      if (imgURLArray.length > 0) {
-        const getImages = () => {
-          return new Promise(resolve => {
-              setTimeout(() => resolve(), 100)
-            })
-          }
-        const requestArr = imgURLArray.map(async imgLink => {
-          await getImages(imgLink);
-          return Axios.get(imgLink)
-                  .then(response => {
-                    imgArray.push(response.data);
-                    console.log('here');
-                  })
-                  .catch(error => console.log(error.toString()))
-          });
-        Promise.all(requestArr).then(() => {
-          setCurrentPageImage(imgURLArray[0]);
-          setCurrentPageText(bookTextArray[0]);
-          setCurrentPageIndex(0);
-          console.log('pg idx: ' + currentPageIndex);
-          setIsLoading(false);
-          console.log('resolved promise.all, isLoading: ' + isLoading);
-          })
-        }
-      }
-    };  
-
-    useEffect(() => {
-      if ((imgListSize > 0) && (currentPageIndex === 0)) {
-        setRightDisabled(false);
-        setLeftDisabled(true);
-      } 
-      if (currentPageIndex === (imgListSize -1)) {
-        setRightDisabled(true);
-        setLeftDisabled(false);
-      }
-    }, [currentPageIndex]);
-
-    function leftClickHandler() {
-      // first, did we back off the last page?
-      if (currentPageIndex <= (imgListSize -1)) {
-        setRightDisabled(false);
-      }
-      // make sure we did not hit page 0
-      if (currentPageIndex > 0) {
-        setCurrentPageIndex(currentPageIndex - 1);
-        setLeftDisabled(false);
-        } else {
-          setLeftDisabled(true);
-        }
-        console.log("left decremented");
-    };
-
-    function rightClickHandler() {
-      if (currentPageIndex < (imgListSize - 1)) {
-        setCurrentPageIndex(currentPageIndex + 1);
-        setLeftDisabled(false);
-        if (currentPageIndex >= imgListSize) {
-          setRightDisabled(true);
-        }
-        console.log('right incremented: ' + currentPageIndex);
-      }
-      console.log("right click, new idx:" + currentPageIndex);
-    }
-
-  useEffect(() => {
-    window.self.addEventListener("slideTransitionStart",  ()=>{
-      console.log("page trans event")})
-    }, []);
-
-  
-  useEffect(() => {
-    Axios.get('assets/bookSet.json')
-      .then(function (response) {
-        // handle success
-        setBookSetJSON(response.data);
-        console.log("book set json loaded");
-      })
-      .catch(function (error) {
-        // handle error
-        console.log(error);
-      })
-    }, []);
-
-  useEffect(() => { // set image to current position
-    if (imgURLArray) {
-    console.log("set image: " + imgURLArray);
-    console.log("page indx: " + currentPageIndex);
-    setCurrentPageImage(imgURLArray[currentPageIndex]);
-    setCurrentPageText(bookTextArray[currentPageIndex]);
-    setCurrentPageTextColor(pageTextColorArray[currentPageIndex]);
-    console.log("img: " + currentPageImage);
-    } else {
-      console.log("Img url array not yet defined");
-    }
-  }, [currentPageIndex]);
-
-  useEffect(() => {
-    if (imgURLArray) {
-      cacheImages(imgURLArray);
-      setIsLoading(false);
-    }
-  }, [imgURLArray]);
-
-  useEffect(() => {
-    if (bookSetJSON) { 
-      let thisURLArray= [];
-      let thisTextArray= [];
-      let thisTextColorArray= [];
-      bookSetJSON.forEach((img) => {
-         //var thisURL= `"`+API_URL + '/' + img.image+`"`;
-         let thisURL= 'assets/' + img.image;
-         let thisText = img.text;
-         let thisTextColor = img.textColor;
-        thisURLArray.push(thisURL);
-        thisTextArray.push(thisText);
-        thisTextColorArray.push(thisTextColor);
-        });
-        console.log("img array b4: " + imgURLArray);
-        setImgURLArray(thisURLArray);
-        setBookTextArray(thisTextArray);
-        setPageTextColorArray(thisTextColorArray);
-        setIsLoading(false);
-        console.log("img array after: " + imgURLArray);
-        console.log("book text array after: " + bookTextArray);
-      setImgListSize(bookSetJSON.length);
-      console.log('list size: ' + imgListSize);
-      } else {
-        console.log("bookSetJSON does not exist");
-      }
-    }, [bookSetJSON]);
-
-    useEffect(() => {
-      setThisWidth(window.outerWidth)
-      document.body.style.backgroundColor = "white";
-
-    }, []);
-
-    const NextArrow = () => {
-      return (
-        <div
-        />
-      )
-    };
-    
-    const PrevArrow = () => {
-      return (
-        <div
-        />
-      )
-    };
-
-  const renderSlides = () => {
-  if (bookSetJSON) {
-    return(
-      bookSetJSON.map(page => 
-        <div class="slider" key={page.image}>
-          <img  className={classes.image} alt="Image for a page" src={page.image} />
-          <p></p><p></p>
-          <div className={classes.textAloneBox} >
-          <Typography className={classes.textAlone} variant="h6">{page.text}</Typography>
-          </div>
-        </div>
-      ))
-    }
-  };
-
-  useEffect(() => {
-    setThisWidth(window.outerWidth)
-    document.body.style.backgroundColor = "white";
-
-  }, []);
-
-  return (
-    <ThemeProvider theme={theme}>
-    <div className="App" >
-       {{isLoading}===true && (
-        <div>
-          <Spinner />
-        </div>
-      )}
-      <MenuAppBar className={classes.appBar} title={'dis book'} />
-    </div>
-    </ThemeProvider>
-  );
+return (
+  <ThemeProvider theme={theme}>
+    <div className="App">
+    <AuthProvider>
+          <Router>
+            <MenuAppBar className={classes.appBar} title={'ANM Main'} />
+            <Routes>
+              <Route path="/pwdset/:token" element={<PwdSet />} />
+              {/* Other routes can be added similarly here */}
+            </Routes>
+          </Router>
+        </AuthProvider>    </div>
+  </ThemeProvider>
+);
 }

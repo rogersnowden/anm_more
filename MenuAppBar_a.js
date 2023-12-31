@@ -73,23 +73,20 @@ export default function MenuAppBar (props)  {
 
   useEffect(() => {
     console.log("isLoggedIn: ", isLoggedIn, "userName: ", userName);
-    if (isLoggedIn && userName) {
-      const fetchLibrary = async () => {
-        try {
-          const data = await ProdService.getLibrary(userName);
-          console.log("getLibrary successful", data);
-          setLibraryItems(data); // Set the data here
-        } catch (error) {
+    if (isLoggedIn) {
+      ProdService.getLibrary(userName, (error, data) => {
+        if (error) {
           setLibraryItems([]);
           setMessage(`Library for user ${userName} not found`);
           setMessageDialogOpen(true);
-          console.error("Error fetching library:", error);
+          // handle error here
+        } else {
+          console.log("getLibrary successful", data);
+          setLibraryItems(data); // You probably want to set the data here
         }
-      };
-  
-      fetchLibrary();
-    }
-  }, [isLoggedIn, userName]); // Added isLoggedIn as well to re-run when it changes
+      });
+    } 
+  }, [isLoggedIn, userName]); // Added userName as a dependency as well
   
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);

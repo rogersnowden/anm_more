@@ -1,5 +1,6 @@
 // AnmRecord
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
+import { AuthContext } from './AuthContext';
 import { makeStyles } from '@mui/styles';
 import createBreakpoints from '@material-ui/core/styles/createBreakpoints';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -286,6 +287,11 @@ const instance = Axios.create({
 
 const UserBase = "cust/users/thisUser/collection/thisBook/";
 
+const { userName, setUserName } = useContext(AuthContext);
+const { firstName, setFirstName } = useContext(AuthContext);
+const { isVerified, setIsVerified } = useContext(AuthContext);
+const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
+const { ownsProduct, setOwnsProduct } = useContext(AuthContext);
 const [showComponent, setShowComponent] = useState(true);
 const [imgURLArray, setImgURLArray] = useState();
 const [completeImgURLArray, setCompleteImgURLArray] = useState();
@@ -519,13 +525,8 @@ const onSwipe = (props) => {
 
   // load json file for book
   useEffect(() => {
-//    let thisURL = BaseURI + UserBase + 'bookSet.json';
-    //let thisURL = BaseURI + 'src/' + 'bookSet.json';
-//    console.log("BaseURI: " + BaseURI);
-    let thisURL = 'https://localhost:27017/';
-    console.log("UserBase: " + UserBase);
-    console.log('thisURL: ' + thisURL);
-    Axios.get(thisURL + 'anm/bookSet' )
+    console.log("username: ", userName);
+    Axios.post(userName)
     .then(function (response) {
       // handle success
       console.log('resp: ' + response.data);

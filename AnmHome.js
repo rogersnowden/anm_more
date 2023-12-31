@@ -1,13 +1,21 @@
-import React from 'react';
-import { Typography } from "@material-ui/core";
+import React, { useState, useEffect, useContext } from 'react';
+import Library from './Library';
+import { AuthContext } from './AuthContext';
+import ProdService from "./services/prod.service";
+import AlertMessageDialog from './AlertMessage';
+import AnmStyledAlert from './AnmStyledAlert';
+import Overlay from './Overlay';
 
-export default function AnmHome () {
-    return(
+export default function AnmHome (libraryItems) {
+  console.log("AnmHome begin");
+    const { isLoggedIn, userName } = useContext(AuthContext);
+    const [message, setMessage] = useState('');
+    const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  
+
+    return (
         <div>
-        There's no place like home...
-        There's no place like home...
-        There's no place like home...
-        There's no place like home...
+            <Library items={libraryItems} />
         </div>
     );
 };

@@ -50,6 +50,7 @@ export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const { isLoggedIn, setIsLoggedIn} = useContext(AuthContext);
+  const { userName, setUserName } = useContext(AuthContext);
   const { firstName, setFirstName } = useContext(AuthContext);
   const { isVerified, setIsVerified } = useContext(AuthContext);
   const { ownsProduct, setOwnsProduct } = useContext(AuthContext);
@@ -73,10 +74,11 @@ export default function Login() {
       } else {
         console.log("successful login", data);
         setIsLoggedIn(true);
+        setUserName(data.username);
         setFirstName(data.firstname);
         setIsVerified(data.isverified)
         setOwnsProduct(data.ownsproduct);
-        // now turn off the form, we are done
+        // now turn off the login form, we are done
         setShowComponent(false);
       }
     });

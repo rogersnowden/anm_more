@@ -8,6 +8,9 @@ const AuthProvider = ({ children }) => {
   const [firstName, setFirstName] = useState(null);
   const [isVerified, setIsVerified] = useState(false);
   const [ownsProduct, setOwnsProduct] = useState(false);
+  const [libraryItems, setLibraryItems] = useState();
+
+  console.log("AuthProvider isLoggedIn: ", isLoggedIn);
 
   return (
     <AuthContext.Provider value={{ 
@@ -15,7 +18,8 @@ const AuthProvider = ({ children }) => {
       userName, setUserName,
       firstName, setFirstName,
       isVerified, setIsVerified, 
-      ownsProduct, setOwnsProduct }}>
+      ownsProduct, setOwnsProduct,
+      libraryItems, setLibraryItems }}>
       {children}
     </AuthContext.Provider>
   );
