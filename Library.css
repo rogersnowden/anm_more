@@ -1,16 +1,33 @@
 /* Library.css */
 .library-container {
-    margin-top: 20px; /* Adjust as needed for spacing below MenuAppBar */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.library-header, .library-item {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
     padding: 10px;
 }
 
-.library-item {
-    border: 1px solid #ddd;
-    padding: 10px;
-    margin-bottom: 10px;
-    cursor: pointer;
+.library-header {
+    background-color: #e0e0e0; /* Optional: color for header */
+    font-weight: bold; /* Optional: make header text bold */
 }
 
 .library-item:hover {
     background-color: #f0f0f0;
 }
+
+.header-title, .item-title, .header-description, .item-description, .header-status, .item-status, .header-record-status, .item-record-status {
+    flex: 1; /* Adjust the flex value as needed for alignment */
+    min-width: 0; /* For text overflow handling */
+    white-space: nowrap; /* For text overflow handling */
+    overflow: hidden; /* For text overflow handling */
+    text-overflow: ellipsis; /* For text overflow handling */
+}
+
+/* Add more specific styles if needed */

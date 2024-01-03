@@ -29,7 +29,6 @@ import SquareIcon from '@mui/icons-material/Square';
 import AnmHome from './AnmHome';
 import AnmProfile from './AnmProfile';
 import AnmSettings from './AnmSettings';
-//import AnmHome from './AnmHome';
 import AnmAbout from './AnmAbout';
 import AnmRegister from './AnmRegister';
 import AnmPasswordRecover from './AnmPasswordRecover';
@@ -86,8 +85,10 @@ export default function MenuAppBar (props)  {
           console.error("Error fetching library:", error);
         }
       };
-  
-      fetchLibrary();
+        fetchLibrary();
+    } else {
+      // if logged out, clear lib items
+      setLibraryItems(null);
     }
   }, [isLoggedIn, userName]); // Added isLoggedIn as well to re-run when it changes
   
@@ -120,7 +121,8 @@ export default function MenuAppBar (props)  {
   };
 
   const anmHome = () => {
-    setWhichPage(<AnmHome key={Date.now()} />);
+    setWhichPage(<AnmHome key={Date.now()} libraryItems={libraryItems} />);
+//    setWhichPage(<AnmHome key={Date.now()} />);
     handleCloseMain();
 };
 
@@ -185,6 +187,14 @@ useEffect(() => {
   // load library json here, then display Library page
   // if logged out, turn page off and destroy json var.
 }, [isLoggedIn]);
+
+useEffect(() => {
+  console.log("isLoggedIn, libraryItems: " +  isLoggedIn + " " + libraryItems);
+  if (isLoggedIn && libraryItems ) {
+    console.log("setting anmhome: " + libraryItems);
+    anmHome();
+  }
+  } , [libraryItems]);
 
 
 const showPage = () => {

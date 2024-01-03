@@ -44,7 +44,7 @@ export default function Logout() {
   const handleLogout = (event) => {
     AuthService.logout(username.trim(), password.trim(), (error, data) =>{
       if (error) {
-        setIsLoggedIn(false);
+//        setIsLoggedIn(false);
         alert(error);
         // handle error here
       } else {

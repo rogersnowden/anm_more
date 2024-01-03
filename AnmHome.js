@@ -6,16 +6,21 @@ import AlertMessageDialog from './AlertMessage';
 import AnmStyledAlert from './AnmStyledAlert';
 import Overlay from './Overlay';
 
-export default function AnmHome (libraryItems) {
+export default function AnmHome (props) {
   console.log("AnmHome begin");
+    const { libraryItems } = props;
     const { isLoggedIn, userName } = useContext(AuthContext);
     const [message, setMessage] = useState('');
     const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+    useEffect(() => {
+      console.log("anm home changes, login, lib" + isLoggedIn, libraryItems);
+    }, [isLoggedIn, libraryItems]);
   
-
     return (
-        <div>
-            <Library items={libraryItems} />
-        </div>
+      <div>
+        {isLoggedIn && (
+            <Library items={libraryItems.librarycontents} />
+            )}
+      </div>
     );
 };

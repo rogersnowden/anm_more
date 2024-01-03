@@ -1,15 +1,22 @@
 // Library.js
 import React from 'react';
-import './Library.css'; // Assuming you have a CSS file for styling
+import './Library.css';
 
 const Library = ({ items }) => {
     return (
         <div className="library-container">
+            <div className="library-header">
+                <span className="header-title">Title</span>
+                <span className="header-description">Description</span>
+                <span className="header-status">Status</span>
+                <span className="header-record-status">Record Status</span>
+            </div>
             {items.map((item, index) => (
-                <div key={index} className="library-item" onClick={() => {/* your click handler logic here */}}>
-                    <h3>{item.title}</h3>
-                    <p>{item.description}</p>
-                    <span>{item.status}</span>
+                <div key={index} className="library-item">
+                    <span className="item-title">{item.title}</span>
+                    <span className="item-description">{item.description}</span>
+                    <span className="item-status">{item.status}</span>
+                    <span className="item-record-status">{item.recordstatus}</span>
                 </div>
             ))}
         </div>
