@@ -26,9 +26,9 @@ import AnmLogin from './Login';
 import AnmLogout from './Logout';
 import SquareIcon from '@mui/icons-material/Square';
 
-import AnmHome from './AnmHome';
 import AnmProfile from './AnmProfile';
 import AnmSettings from './AnmSettings';
+import AnmHome from './AnmHome';
 import AnmAbout from './AnmAbout';
 import AnmRegister from './AnmRegister';
 import AnmPasswordRecover from './AnmPasswordRecover';
@@ -40,8 +40,6 @@ import AnmNotifications from './AnmNotifications';
 import './App.css';
 
 export default function MenuAppBar (props)  {
-
-  console.log("MenuAppBar starts");
 
   const { userName, setUserName } = useContext(AuthContext);
   const { firstName, setFirstName } = useContext(AuthContext);
@@ -56,9 +54,9 @@ export default function MenuAppBar (props)  {
   const [isShowingBar, setShowingBar] = useState(false);
   const [whichPage, setWhichPage] = useState();
   const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
-
   const [message, setMessage] = useState('');
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+
 
   // setting icon open drop down menu of its own
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
@@ -121,12 +119,11 @@ export default function MenuAppBar (props)  {
   };
 
   const anmHome = () => {
-    setWhichPage(<AnmHome key={Date.now()} libraryItems={libraryItems} />);
-//    setWhichPage(<AnmHome key={Date.now()} />);
+    setWhichPage(<AnmHome key={Date.now()} />);
     handleCloseMain();
 };
 
-const anmBook = () => {
+  const anmBook = () => {
     setWhichPage(<AnmBook key={Date.now()} />);
     handleCloseMain();
 };
@@ -183,18 +180,8 @@ const anmNotifications = () => {
 };
 
 useEffect(() => {
-  console.log("menu, set logged in status: ", isLoggedIn);
-  // load library json here, then display Library page
-  // if logged out, turn page off and destroy json var.
+  console.log("set logged in status: ", isLoggedIn);
 }, [isLoggedIn]);
-
-useEffect(() => {
-  console.log("isLoggedIn, libraryItems: " +  isLoggedIn + " " + libraryItems);
-  if (isLoggedIn && libraryItems ) {
-    console.log("setting anmhome: " + libraryItems);
-    anmHome();
-  }
-  } , [libraryItems]);
 
 
 const showPage = () => {
@@ -221,7 +208,7 @@ const showPage = () => {
               aria-haspopup="true"
               sx={{ mr: 2 }}
             >
-              <MenuIcon />
+              <MenuIcon onClick={handleMenuMain} />
             </IconButton>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                 ANM

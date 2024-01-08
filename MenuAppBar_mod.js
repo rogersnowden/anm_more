@@ -29,7 +29,6 @@ import SquareIcon from '@mui/icons-material/Square';
 import AnmHome from './AnmHome';
 import AnmProfile from './AnmProfile';
 import AnmSettings from './AnmSettings';
-//import AnmHome from './AnmHome';
 import AnmAbout from './AnmAbout';
 import AnmRegister from './AnmRegister';
 import AnmPasswordRecover from './AnmPasswordRecover';
@@ -37,6 +36,7 @@ import AnmBook from './AnmBook';
 import AnmRecord from './AnmRecord';
 import AnmShop from './AnmShop';
 import AnmNotifications from './AnmNotifications';
+import Library from './Library';
 
 import './App.css';
 
@@ -73,20 +73,25 @@ export default function MenuAppBar (props)  {
 
   useEffect(() => {
     console.log("isLoggedIn: ", isLoggedIn, "userName: ", userName);
-    if (isLoggedIn) {
-      ProdService.getLibrary(userName, (error, data) => {
-        if (error) {
+    if (isLoggedIn && userName) {
+      const fetchLibrary = async () => {
+        try {
+          const data = await ProdService.getLibrary(userName);
+          console.log("getLibrary successful", data);
+          setLibraryItems(data); // Set the data here
+        } catch (error) {
           setLibraryItems([]);
           setMessage(`Library for user ${userName} not found`);
           setMessageDialogOpen(true);
-          // handle error here
-        } else {
-          console.log("getLibrary successful", data);
-          setLibraryItems(data); // You probably want to set the data here
+          console.error("Error fetching library:", error);
         }
-      });
-    } 
-  }, [isLoggedIn, userName]); // Added userName as a dependency as well
+      };
+        fetchLibrary();
+    } else {
+      // if logged out, clear lib items
+      setLibraryItems(null);
+    }
+  }, [isLoggedIn, userName]); // Added isLoggedIn as well to re-run when it changes
   
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -117,7 +122,8 @@ export default function MenuAppBar (props)  {
   };
 
   const anmHome = () => {
-    setWhichPage(<AnmHome key={Date.now()} />);
+    setWhichPage(<AnmHome key={Date.now()} libraryItems={libraryItems} />);
+//    setWhichPage(<AnmHome key={Date.now()} />);
     handleCloseMain();
 };
 
@@ -182,6 +188,14 @@ useEffect(() => {
   // load library json here, then display Library page
   // if logged out, turn page off and destroy json var.
 }, [isLoggedIn]);
+
+useEffect(() => {
+  console.log("isLoggedIn, libraryItems: " +  isLoggedIn + " " + libraryItems);
+  if (isLoggedIn && libraryItems ) {
+    console.log("setting anmhome: " + libraryItems);
+    anmHome();
+  }
+  } , [libraryItems]);
 
 
 const showPage = () => {

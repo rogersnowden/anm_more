@@ -14,6 +14,7 @@ import Overlay from './Overlay';
 
 const useStyles = makeStyles((theme) => ({
   root: {
+    backgroundColor: 'transparent',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
