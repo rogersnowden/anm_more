@@ -46,6 +46,8 @@ export default function MenuAppBar (props)  {
   const { isVerified, setIsVerified } = useContext(AuthContext);
   const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
   const { ownsProduct, setOwnsProduct } = useContext(AuthContext);
+  const { wasCancelled, setWasCancelled } = useContext(AuthContext);
+
   const [libraryItems, setLibraryItems] = useState([]);
   // auth default 'true' while developing only
   const [auth, setAuth] = useState(true);
@@ -119,7 +121,7 @@ export default function MenuAppBar (props)  {
   };
 
   const anmHome = () => {
-    setWhichPage(<AnmHome key={Date.now()} />);
+    setWhichPage(<AnmHome key={Date.now()} libraryItems={libraryItems} />);
     handleCloseMain();
 };
 
@@ -181,8 +183,19 @@ const anmNotifications = () => {
 
 useEffect(() => {
   console.log("set logged in status: ", isLoggedIn);
-}, [isLoggedIn]);
+  if (wasCancelled) {
+    anmHome()
+    setWasCancelled(false);
+  }
+  }, [wasCancelled]);
 
+useEffect(() => {
+  console.log("isLoggedIn, libraryItems: " +  isLoggedIn + " " + libraryItems);
+  if (isLoggedIn && libraryItems ) {
+    console.log("setting anmhome: " + libraryItems);
+    anmHome();
+  }
+  } , [libraryItems]);
 
 const showPage = () => {
     //console.log('show page: ' + whichPage.type.name);
@@ -257,7 +270,7 @@ const showPage = () => {
               <>
                 <IconButton
                   size="large"
-                  aria-label="login user"
+                  aria-label="logout user"
                   aria-controls="menu-appbar"
                   aria-haspopup="true"
                   onClick={handleMenu}

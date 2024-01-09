@@ -56,6 +56,8 @@ export default function Login() {
   const { isVerified, setIsVerified } = useContext(AuthContext);
   const { ownsProduct, setOwnsProduct } = useContext(AuthContext);
   const { roles, setRoles} = useContext(AuthContext);
+  const { setWasCancelled } = useContext(AuthContext);
+
   const [message, setMessage] = useState('');
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [passwordRecoverOpen, setPasswordRecoverOpen] = useState(false);
@@ -90,8 +92,8 @@ export default function Login() {
   }, [isLoggedIn]);
 
   function handleCancel() {
+    setWasCancelled(true)
     setShowComponent(false);
-//    console.log("record cancel");
   };
 
   const handleForgotPassword = (event) => {

@@ -40,6 +40,7 @@ export default function Logout() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const { isLoggedIn, setIsLoggedIn} = useContext(AuthContext);
+  const { setWasCancelled } = useContext(AuthContext);
 
   const handleLogout = (event) => {
     AuthService.logout(username.trim(), password.trim(), (error, data) =>{
@@ -60,6 +61,7 @@ export default function Logout() {
   function handleCancel() {
     // do nothing but close the form
     setShowComponent(false);
+    setWasCancelled(true);
   };
 
   return (
