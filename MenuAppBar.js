@@ -41,6 +41,7 @@ import './App.css';
 
 export default function MenuAppBar (props)  {
 
+  const { baseURL, setBaseURL } = useContext(AuthContext);
   const { userName, setUserName } = useContext(AuthContext);
   const { firstName, setFirstName } = useContext(AuthContext);
   const { isVerified, setIsVerified } = useContext(AuthContext);

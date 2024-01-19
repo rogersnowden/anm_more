@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -24,8 +24,6 @@ const theme = createTheme({
 });
 
 export default function App() {
-
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const useStyles = makeStyles((theme) => ({
       appBar: {
