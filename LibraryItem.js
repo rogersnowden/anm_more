@@ -1,12 +1,15 @@
-import React from 'react';
+import React, {useState, useContext} from 'react';
+import { AuthContext } from './AuthContext';
 import './LibraryItem.css'; // Assuming you have a separate CSS file for this component
 
+
 const LibraryItem = ({ item }) => {
+    const { APIURL } = useContext(AuthContext);
+    const imageUrl = `${APIURL}products/thumbs/${item.coverimage}`;
     return (
         <div className="library-item">
             <div className="item-image">
-            console.log(window.location.origin + '/cover_1.png');
-            <img src={item.coverimage} alt={item.title} />
+            <img src={imageUrl} alt={item.title} />
             </div>
             <div className="item-info">
                 <div className="item-title">{item.title}</div>

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useState, useContext} from 'react';
+import { AuthContext } from './AuthContext';
 import './Library.css';
 import LibraryItem from './LibraryItem'; // Import the new component
 

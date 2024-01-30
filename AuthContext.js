@@ -4,6 +4,7 @@ const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [baseURL] = useState(window.location.origin);
+  const [APIURL] = useState('https://localhost:4000/');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState(null);
   const [firstName, setFirstName] = useState(null);
@@ -17,6 +18,7 @@ const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={{ 
       baseURL,
+      APIURL,
       isLoggedIn, setIsLoggedIn, 
       userName, setUserName,
       firstName, setFirstName,
