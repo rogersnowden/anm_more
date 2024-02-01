@@ -11,11 +11,7 @@ const Library = ({ items }) => {
             {hasItems && (
                 <>
                     <div className="library-header">
-                        <span className="header-image">Image</span>
-                        <span className="header-title">Title</span>
-                        <span className="header-description">Description</span>
-                        <span className="header-status">Status</span>
-                        <span className="header-record-status">Record Status</span>
+                        <span className="header-title">My Library</span>
                     </div>
                     {items.map((item, index) => (
                         <LibraryItem key={index} item={item} />

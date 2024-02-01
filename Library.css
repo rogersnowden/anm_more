@@ -1,33 +1,93 @@
-/* Library.css */
+/* LibraryCombined.css */
+
 .library-container {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 20px;
+    margin: 20px;
 }
 
 .library-header, .library-item {
-    display: flex;
-    justify-content: flex-start;
+    display: grid;
+    grid-template-columns: 120px 1fr 2fr 1fr 1fr; /* Allocate space for each element */
     align-items: center;
     gap: 10px;
     padding: 10px;
 }
 
 .library-header {
-    background-color: #e9e0e0; /* Optional: color for header */
-    font-weight: bold; /* Optional: make header text bold */
+    background-color: #efeeee;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.library-item {
+    border-radius: 10px; /* Rounded corners for each item */
+    border: 1px solid #cccccc; /* Thin line border with a light grey color */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Drop shadow for depth */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+    display: grid;
+    grid-template-columns: 120px 1fr 2fr 1fr 1fr; /* Allocate space for each element */
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
 }
 
 .library-item:hover {
     background-color: #f0f0f0;
 }
 
-.header-title, .item-title, .header-description, .item-description, .header-status, .item-status, .header-record-status, .item-record-status {
-    flex: 1; /* Adjust the flex value as needed for alignment */
-    min-width: 0; /* For text overflow handling */
-    white-space: nowrap; /* For text overflow handling */
-    overflow: hidden; /* For text overflow handling */
-    text-overflow: ellipsis; /* For text overflow handling */
+.item-image img {
+    width: 100%;
+    max-width: 120px; /* Ensure images do not become too large */
+    height: auto;
+    border-radius: 5px;
 }
 
-/* Add more specific styles if needed */
+.item-title {
+    font-weight: bold;
+}
+
+.item-status {
+    font-weight: bold;
+}
+/* Responsive adjustments for tablets */
+@media (max-width: 768px) {
+    .library-header, .library-item {
+        grid-template-columns: auto 1fr; /* Switch to a simpler two-column layout */
+    }
+
+    .item-image img {
+        max-width: 80px; /* Adjust image size for smaller screens */
+    }
+}
+
+/* Further adjustments for mobile phones */
+@media (max-width: 480px) {
+    .library-header, .library-item {
+        grid-template-columns: 1fr; /* Stack elements vertically */
+        text-align: center; /* Center-align text for a cleaner look */
+    }
+
+    .item-image {
+        order: 1; /* Image first */
+        margin: 0 auto; /* Center the image */
+        max-width: 80px;
+    }
+
+    .item-title {
+        order: 2; /* Title next */
+    }
+
+    .item-description {
+        order: 3; /* Description follows */
+    }
+
+    .item-status {
+        order: 4; /* Status thereafter */
+    }
+
+    .item-record-status {
+        order: 5; /* Record status last */
+    }
+}
