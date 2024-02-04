@@ -49,6 +49,8 @@ export default function MenuAppBar (props)  {
   const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
   const { ownsProduct, setOwnsProduct } = useContext(AuthContext);
   const { wasCancelled, setWasCancelled } = useContext(AuthContext);
+  const { productSKU, setProductSKU } = useContext(AuthContext);
+  const { productResponse, setProductResponse } = useContext(AuthContext);
 
   const [libraryItems, setLibraryItems] = useState([]);
   // auth default 'true' while developing only
@@ -94,6 +96,18 @@ export default function MenuAppBar (props)  {
     }
   }, [isLoggedIn, userName]); // Added isLoggedIn as well to re-run when it changes
   
+  useEffect(() => {
+    if (productSKU ) {
+      console.log(" sku set, found");
+      if (productResponse == ('record')) {
+        anmRecord(userName, productSKU);
+      }
+      if (productResponse == ('playshare')) {
+        anmBook(userName, productSKU);
+      }
+    }
+  }, [productSKU]);
+
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };

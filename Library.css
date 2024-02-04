@@ -46,8 +46,13 @@
 
 .item-title {
     font-weight: bold;
+    color: #0064f9;
 }
 
+.item-description {
+    text-align: left;
+    color: #000000;
+}
 .item-status {
     font-weight: bold;
 }

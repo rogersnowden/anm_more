@@ -11,7 +11,9 @@ const AuthProvider = ({ children }) => {
   const [isVerified, setIsVerified] = useState(false);
   const [ownsProduct, setOwnsProduct] = useState(false);
   const [libraryItems, setLibraryItems] = useState();
-  const [ wasCancelled, setWasCancelled] = useState(false);
+  const [wasCancelled, setWasCancelled] = useState(false);
+  const [productSKU, setProductSKU] = useState();
+  const [productResponse, setProductResponse] = useState();
 
   console.log("AuthProvider isLoggedIn: ", isLoggedIn);
 
@@ -26,6 +28,8 @@ const AuthProvider = ({ children }) => {
       ownsProduct, setOwnsProduct,
       libraryItems, setLibraryItems,
       wasCancelled, setWasCancelled,
+      productSKU, setProductSKU,
+      productResponse, setProductResponse,
        }}>
       {children}
     </AuthContext.Provider>
