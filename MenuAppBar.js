@@ -100,10 +100,10 @@ export default function MenuAppBar (props)  {
     if (productSKU ) {
       console.log(" sku set, found");
       if (productResponse == ('record')) {
-        anmRecord(userName, productSKU);
+        anmRecord({userName, productSKU});
       }
       if (productResponse == ('playshare')) {
-        anmBook(userName, productSKU);
+        anmBook();
       }
     }
   }, [productSKU]);
@@ -151,11 +151,10 @@ const anmShop = () => {
   handleCloseMain();
 };
 
-const anmRecord = () => {
-  setWhichPage(<AnmRecord key={Date.now()} />);
+const anmRecord = ({userName, productSKU}) => {
+  setWhichPage(<AnmRecord key={Date.now()} userName={userName} productSKU={productSKU} />);
   handleCloseMain();
 };
-
 const anmAbout = () => {
   setWhichPage(<AnmAbout key={Date.now()} />);
   handleCloseMain();
