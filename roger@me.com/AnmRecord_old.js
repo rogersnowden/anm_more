@@ -1,6 +1,5 @@
 // AnmRecord
 import React, { useState, useEffect, useRef, useContext } from "react";
-import ProdService from "./services/prod.service";
 import { AuthContext } from './AuthContext';
 import { makeStyles } from '@mui/styles';
 import createBreakpoints from '@material-ui/core/styles/createBreakpoints';
@@ -51,13 +50,9 @@ const theme = createTheme({
 
 console.log('theme: ' + theme);
 
-//export default function AnmRecord({ userName, productSKU }) {
-export default function AnmRecord() {
+export default function AnmRecord(props) {
 
-  const API_URL = "https://localhost:4000/api/";
-  const THIS_BOOK_URL = API_URL + 'users/' + userName + '/mybooks/'  
-  + productSKU + '/';
-
+  console.log("props:" + props);
 
   const useStyles = makeStyles((theme) => ({
       appBar: {
@@ -293,12 +288,10 @@ const instance = Axios.create({
 const UserBase = "cust/users/thisUser/collection/thisBook/";
 
 const { userName, setUserName } = useContext(AuthContext);
-const { productSKU, setProductSKU } = useContext(AuthContext);
 const { firstName, setFirstName } = useContext(AuthContext);
 const { isVerified, setIsVerified } = useContext(AuthContext);
 const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
 const { ownsProduct, setOwnsProduct } = useContext(AuthContext);
-const {userBook} = useContext(AuthContext);
 const [showComponent, setShowComponent] = useState(true);
 const [imgURLArray, setImgURLArray] = useState();
 const [completeImgURLArray, setCompleteImgURLArray] = useState();
@@ -348,11 +341,9 @@ const audioURLArray = [];
 
 const audioRef= useRef();
 // test axios
-//const j = Axios;
-
+const j = Axios;
 // cb func 
 function updateAudioObjArray(thisAudio) {
-  console.log("updateAudioObjArray");
   console.log('new audio: ' + thisAudio);
   console.log('audioObj: ' + audioObjArray);
   console.log("currentPageIndex: " + currentPageIndex);
@@ -374,53 +365,66 @@ function updateAudioObjArray(thisAudio) {
   
   };
   
-  function preloadImagesForNextPages(currentPageIndex, bookContents) {
-    console.log("preloadImageForNextPages 2");
-    const head = document.getElementsByTagName('head')[0];
-    // Remove existing preload links to avoid clutter and unnecessary preloading
-    const existingPreloads = document.querySelectorAll('link[rel="preload"]');
-    existingPreloads.forEach(link => head.removeChild(link));
-    // Determine the range of pages to preload; adjust according to your needs
-    const startPage = currentPageIndex + 1;
-    const endPage = Math.min(startPage + 2, userBook.bookcontents.length); // Preload next 2 pages, adjust as needed
-    for (let i = startPage; i < endPage; i++) {
-      const page = bookContents[i];
-      if (page && page.image) {
-        const preloadLink = document.createElement('link');
-        preloadLink.rel = 'preload';
-        preloadLink.as = 'image';
-        preloadLink.href = API_URL + `users/${userName}/mybooks/${userBook.sku}/` + page.image;
-        console.log("preload link: " + preloadLink.href);
-        head.appendChild(preloadLink);
-      }
-      console.log("head: " + head);
-    }
-  };
-   
 const { recorderState, ...handlers } = useRecorder({updateAudioObjArray});
 
 const { audio } = recorderState;
 
 const onChangeSlide = (newSlide)  => {
-  console.log("onChangeSlide");
-  setCurrentPageText(userBook[newSlide]);
+  setCurrentPageText(bookTextArray[newSlide]);
   setIndexVal(newSlide);
   setCurrentPageIndex(newSlide);
   // set current play Audio
-//  if (audioObjArray[newSlide].src) {
-//    setPlayDisabled(false);
-//  }
-//  setCurrentAudio(audioObjArray[newSlide]);
+  if (audioObjArray[newSlide].src) {
+    setPlayDisabled(false);
+  }
+  setCurrentAudio(audioObjArray[newSlide]);
   console.log("new slide: " + newSlide);
   };
 
 const onSwipe = (props) => {
-  console.log("onSwipe");
   console.log('swiped');
 };
 
+  function cacheImages(completeImgURLArray) {
+    if (completeImgURLArray){
+      console.log("img url arr 0: " + completeImgURLArray[0]);
+      console.log("img url arr 1: " + completeImgURLArray[1]);
+      if (completeImgURLArray.length > 0) {
+        const getImages = () => {
+          return new Promise(resolve => {
+              setTimeout(() => resolve(), 100)
+            })
+          }
+        const requestArr = completeImgURLArray.map(async imgLink => {
+          await getImages(imgLink);
+          console.log('base: ' + BaseURI);
+          console.log("img link: " + imgLink);
+          return Axios.get(imgLink)
+                  .then(response => {
+                    imgArray.push(response.data);
+                    console.log('response here: ' + response.data);
+                  })
+                  .catch(error => {
+                    console.log("img fetch err" + error.toString())}
+                    );
+          });
+          console.log("Req arr: " + requestArr[0] + requestArr[1]);
+        Promise.all(requestArr).then(() => {
+          setCurrentPageImage(completeImgURLArray[0]);
+          console.log('after prom img url 0: ' + completeImgURLArray[0]);
+          console.log('after prom img url 1: ' + completeImgURLArray[1]);
+          setCurrentPageText(bookTextArray[0]);
+          console.log("text arr: " + bookTextArray);
+          setCurrentPageIndex(0);
+          console.log('pg idx: ' + currentPageIndex);
+          setIsLoading(false);
+          console.log('resolved promise.all, isLoading: ' + isLoading);
+          })
+        }
+      }
+    };  
+
     function cacheAudio() {
-      console.log("cacheAudio");
       if (audioURLArray) {
         if (audioURLArray.length > 0) {
           // init the target finished array
@@ -463,7 +467,6 @@ const onSwipe = (props) => {
       };  
 
       useEffect(() => { // set image to current position
-        console.log("FX 3 currentPageIndex");
       if (completeImgURLArray) {
       console.log("page indx: " + currentPageIndex);
       console.log("curr img: " + completeImgURLArray[currentPageIndex]);
@@ -483,9 +486,9 @@ const onSwipe = (props) => {
         setLeftDisabled(false);
       }
       // if an audio url/obj exists, enable play
-//      if ((currentPageIndex) && (audioObjArray[currentPageIndex].audio )) {
-//        setPlayDisabled(false);
-//      }
+      if ((currentPageIndex) && (audioObjArray[currentPageIndex].audio )) {
+        setPlayDisabled(false);
+      }
     }, [currentPageIndex]);
 
     function leftClickHandler() {
@@ -516,11 +519,40 @@ const onSwipe = (props) => {
     }
 
   useEffect(() => {
-    console.log("FX 4 add window slideTransition listener");
     window.self.addEventListener("slideTransitionStart",  ()=>{
       console.log("page trans event")})
     }, []);
 
+  // load json file for book
+  useEffect(() => {
+    console.log("Retrieving bookSet.json");
+  
+    // Using fetch to get the bookSet.json from the public directory
+    fetch('/bookSet.json')
+      .then(response => {
+        // Check if the response is ok (status in the range 200-299)
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json(); // Parse JSON data from the response
+      })
+      .then(data => {
+        console.log('Response data:', data);
+        setBookSetJSON(data); // Set state with the fetched data
+      })
+      .catch(error => {
+        // Handle any errors
+        console.error('There was a problem with fetching bookSet.json:', error);
+      });
+  }, []); // Empty dependency array means this effect runs once on mount
+  
+  //      headers: {
+//          "Content-Type": "application/json",
+//          "Access-Control-Allow-Origin": "*",
+//          "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
+//          "Access-Control-Allow-Headers": "Origin, Content-Type, X-Auth-Token, Authorization, Accept,charset,boundary,Content-Length"
+
+    
   // post audio to server
     function pushAudio () {
       var form = new FormData();
@@ -529,8 +561,10 @@ const onSwipe = (props) => {
       const data = {
         "user" : "test",
       };
+
       form.append("files.file", aFile);
       form.append('data', JSON.stringify(data));
+
       instance.post(instance.baseURL + '/file_upload.pl', 
         {form}, 
         {headers : {
@@ -551,10 +585,8 @@ const onSwipe = (props) => {
   //TODO Create array of cached audio obj from prev sessions
 
   useEffect(() => {
-    console.log("FX 5 completeImgURLArray");
-
     if (completeImgURLArray) {
-//      cacheImages(completeImgURLArray);
+      cacheImages(completeImgURLArray);
       setIsLoading(false);
     }
   }, [completeImgURLArray]);
@@ -568,8 +600,6 @@ const onSwipe = (props) => {
 
   // read json, iterate through and set up page contents
   useEffect(() => {
-    console.log("FX 6 bookSetJSON");
-var z = userBook;
     if (bookSetJSON) { 
       let thisImgURLArray= [];
       let thisTextArray= [];
@@ -609,8 +639,6 @@ var z = userBook;
     }, [bookSetJSON]);
 
     useEffect(() => {
-      console.log("FX 7 setThisWidth:" + playState);
-
       setThisWidth(window.outerWidth)
       document.body.style.backgroundColor = "white";
 
@@ -631,8 +659,6 @@ var z = userBook;
     };
 
   useEffect(() => {
-    console.log("FX 8 setthiswidth emtpy" + playState);
-
     setThisWidth(window.outerWidth)
     document.body.style.backgroundColor = "white";
 
@@ -662,7 +688,6 @@ var z = userBook;
   };
 
   function pausePlay() {
-    console.log("pausePlay:" + playState);
     audioObjArray[currentPageIndex].current.pause();
     setAudioPaused(true);
     setPlayOpacity(1);
@@ -671,7 +696,6 @@ var z = userBook;
   };
 
   function forcePlayReset() {
-    console.log("forcePlayReset:" + playState);
     setPlayOpacity(1);
     setPlayDisabled(false);
 //    stopTimer();
@@ -679,8 +703,6 @@ var z = userBook;
   };
 
   useEffect(() => {
-    console.log("FX 9 playDisabled:" + playState);
-
     if (playDisabled && currentAudio) {
       currentAudio.onended = (event) => {
         forcePlayReset();
@@ -690,8 +712,6 @@ var z = userBook;
   }, [playDisabled]);
 
   function turnOnPlay() {
-    console.log("turnOnPlay:" + playState);
-
     currentAudio.play();
     console.log("play time");
    // audioArray[currentPageIndex].current.play();
@@ -699,7 +719,7 @@ var z = userBook;
   };
     
   function handleRecordClick() {
-    console.log("handleRecordClick:" + playState);
+    console.log("clicked record:" + recordState);
     setRecordState(recordState => !recordState);
     recordState === true ? 
       turnOnRecord() :
@@ -707,7 +727,7 @@ var z = userBook;
   };
 
   function handlePlayClick() {
-    console.log("handlePlayClick:" + playState);
+    console.log("clicked play:" + playState);
 //    alert("play click, playDisabled: " + playDisabled);
     if (playPause=== "Play") {
       turnOnPlay();
@@ -725,11 +745,9 @@ var z = userBook;
 
   // TODO: load cached audio blobs/files, also save recorded files
   const renderSlides = () => {
-    console.log("userBook: " + userBook);
-    console.log("renderSlides");
-    if (userBook) {
+    if (bookSetJSON) {
       return(
-        userBook.bookcontents.map(page => 
+        bookSetJSON.map(page => 
           <div class="slider" key={page.image}>
             <img  className={classes.image} alt="Image for a page" src={page.image} />
             <p></p><p></p>

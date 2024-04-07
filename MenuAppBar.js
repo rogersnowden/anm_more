@@ -48,6 +48,7 @@ export default function MenuAppBar (props)  {
   const { isVerified, setIsVerified } = useContext(AuthContext);
   const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
   const { ownsProduct, setOwnsProduct } = useContext(AuthContext);
+  const {userBook, setUserBook} = useContext(AuthContext);
   const { wasCancelled, setWasCancelled } = useContext(AuthContext);
   const { productSKU, setProductSKU } = useContext(AuthContext);
   const { productResponse, setProductResponse } = useContext(AuthContext);
@@ -97,16 +98,17 @@ export default function MenuAppBar (props)  {
   }, [isLoggedIn, userName]); // Added isLoggedIn as well to re-run when it changes
   
   useEffect(() => {
-    if (productSKU ) {
+    if (userBook ) {
       console.log(" sku set, found");
       if (productResponse == ('record')) {
-        anmRecord({userName, productSKU});
+//        anmRecord({userName, productSKU});
+        anmRecord({userBook});
       }
       if (productResponse == ('playshare')) {
         anmBook();
       }
     }
-  }, [productSKU]);
+  }, [userBook, userName, productSKU, productResponse]);
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -151,8 +153,8 @@ const anmShop = () => {
   handleCloseMain();
 };
 
-const anmRecord = ({userName, productSKU}) => {
-  setWhichPage(<AnmRecord key={Date.now()} userName={userName} productSKU={productSKU} />);
+const anmRecord = () => {
+  setWhichPage(<AnmRecord key={Date.now()} />);
   handleCloseMain();
 };
 const anmAbout = () => {

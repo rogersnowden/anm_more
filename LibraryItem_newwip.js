@@ -4,7 +4,7 @@ import ProdService from "./services/prod.service";
 import './Library.css';
 
 const LibraryItem = ({ item }) => {
-    const { APIURL, productSKU, setProductSKU, setProductResponse, setUserBook, userName } = useContext(AuthContext);
+    const { APIURL, setProductSKU, setProductResponse, setUserBook, userName } = useContext(AuthContext);
     const imageUrl = `${APIURL}products/thumbs/${item.coverimage}`;
 
     const handleItemSelect = (selectedItem) => {
@@ -15,20 +15,6 @@ const LibraryItem = ({ item }) => {
         // You can now access selectedItem.title, selectedItem.description, etc.
     };
         
-    function localizeUserBook(thisBook) {
-        let SKU= thisBook.sku;
-        for (let i=0; i< thisBook.bookcontents.length; i++) {
-            let img = thisBook.bookcontents[i].image;
-            let aud = thisBook.bookcontents[i].audio;
-            thisBook.bookcontents[i].image = 
-                `${APIURL}users/${userName}/mybooks/${SKU}/${img}`;
-                console.log(" thisimageurl: " + thisBook.bookcontents[i].image);
-                thisBook.bookcontents[i].audio = 
-                `${APIURL}users/${userName}/mybooks/${SKU}/${aud}`;
-                console.log(" thisimageurl: " + thisBook.bookcontents[i].audio);
-        }
-    };
-
 // from params passed, get this book (productSKU)
     function getUserBook(userName, SKU) {
         console.log("FX 1");
@@ -41,8 +27,6 @@ const LibraryItem = ({ item }) => {
         .then(data => {
             if (isMounted) { // Only update state if component is still mounted
             console.log("get user book successful", data);
-            var thisBook= data;
-            localizeUserBook(thisBook);
             setUserBook(data);
             console.log("set user book");
             setProductResponse('record');

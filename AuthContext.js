@@ -13,9 +13,11 @@ const AuthProvider = ({ children }) => {
   const [libraryItems, setLibraryItems] = useState();
   const [wasCancelled, setWasCancelled] = useState(false);
   const [productSKU, setProductSKU] = useState();
+  const [userBook, setUserBook] = useState();
   const [productResponse, setProductResponse] = useState();
 
   console.log("AuthProvider isLoggedIn: ", isLoggedIn);
+  console.log("AuthProvider userBook: ", userBook);
 
   return (
     <AuthContext.Provider value={{ 
@@ -29,6 +31,7 @@ const AuthProvider = ({ children }) => {
       libraryItems, setLibraryItems,
       wasCancelled, setWasCancelled,
       productSKU, setProductSKU,
+      userBook, setUserBook,
       productResponse, setProductResponse,
        }}>
       {children}
