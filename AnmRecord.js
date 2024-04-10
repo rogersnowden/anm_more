@@ -52,7 +52,7 @@ const theme = createTheme({
 console.log('theme: ' + theme);
 
 //export default function AnmRecord({ userName, productSKU }) {
-export default function AnmRecord() {
+export default function AnmRecord({userName, productSKU}) {
 
   const API_URL = "https://localhost:4000/api/";
   const THIS_BOOK_URL = API_URL + 'users/' + userName + '/mybooks/'  
@@ -292,8 +292,8 @@ const instance = Axios.create({
 
 const UserBase = "cust/users/thisUser/collection/thisBook/";
 
-const { userName, setUserName } = useContext(AuthContext);
-const { productSKU, setProductSKU } = useContext(AuthContext);
+//const { userName, setUserName } = useContext(AuthContext);
+//const { productSKU, setProductSKU } = useContext(AuthContext);
 const { firstName, setFirstName } = useContext(AuthContext);
 const { isVerified, setIsVerified } = useContext(AuthContext);
 const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
@@ -772,15 +772,29 @@ var z = userBook;
                 </Slider>
               </Box>
               <Grid container justify="space-around" className={classes.recordControls}>
-                <Grid>
-                  {/* Your existing code */}
-                </Grid>
-                <Grid>
-                  {/* Your existing code */}
-                </Grid>
-                <Grid>
-                  {/* Your existing code */}
-                </Grid>
+              <Grid >
+        {recText === "Record" ?
+          <RecButton onClick={handleRecordClick}/> :
+          <RecButtonOff onClick={handleRecordClick}/>
+          }
+        </Grid>
+        <Grid>
+          &nbsp;
+        {
+            recText === 'Record' ? 
+        <TinyDotBlue  /> :
+        <TinyDotRed  /> 
+        }
+          &nbsp;
+        </Grid>
+        <Grid>
+          {playPause === "Play" ?
+              <PlayButton disabled={playDisabled} onClick={handlePlayClick} style={{opacity: {opacityStyle}}} 
+              /> :
+              <PauseButton onClick={handlePlayClick} 
+              /> 
+          }
+        </Grid>
               </Grid>
             </React.Fragment>
           )}

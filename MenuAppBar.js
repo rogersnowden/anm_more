@@ -101,10 +101,10 @@ export default function MenuAppBar (props)  {
     if (userBook ) {
       console.log(" sku set, found");
       if (productResponse == ('record')) {
-//        anmRecord({userName, productSKU});
-        anmRecord({userBook});
+        anmRecord({userName, productSKU});
+//        anmRecord({userBook});
       }
-      if (productResponse == ('playshare')) {
+      else if (productResponse == ('playshare')) {
         anmBook();
       }
     }
