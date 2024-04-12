@@ -160,32 +160,28 @@ export default function AnmRecord({userName, productSKU}) {
         backgroundColor: 'white',
       },
     },
-    image: {
-        position: 'relative',
-        verticalAlign: 'top',
-        height: '30vh',
-        width: 'auto',
-        [breakpoints.up('xs')]: {
-          height: '10.0vh',
-          width: 'auto',
-        },
-        [breakpoints.up('sm')]: {
-          height: '53.0vh',
-          width: 'auto',
-        },
-        [breakpoints.up('md')]: {
-          height: '52.5vh',
-          width: 'auto',
-        },
-        [breakpoints.up('lg')]: {
-          height: '54vh',
-          width: '80',
-        },
-        [breakpoints.up('xl')]: {
-          height: '66.5vh',
-          width: 'auto',
-        },
-      },
+image: {
+    position: 'relative',
+    height: '30vh', // Adjust height as necessary
+    width: 'auto', // Auto width for maintaining aspect ratio
+    objectFit: 'cover', // Cover ensures the aspect ratio is maintained without skewing
+    objectPosition: 'center', // Center the image within its container
+    [breakpoints.up('xs')]: {
+      height: '22.5vh', // Adjusted for 4:3 aspect ratio (height is 3/4 of width)
+    },
+    [breakpoints.up('sm')]: {
+      height: '39.75vh', // Adjusted for 4:3 aspect ratio
+    },
+    [breakpoints.up('md')]: {
+      height: '39.375vh', // Adjusted for 4:3 aspect ratio
+    },
+    [breakpoints.up('lg')]: {
+      height: '40.5vh', // Adjusted for 4:3 aspect ratio
+    },
+    [breakpoints.up('xl')]: {
+      height: '49.875vh', // Adjusted for 4:3 aspect ratio
+    },
+},
       textAloneBox: {
         backgroundColor: "white",
         position: 'relative',
