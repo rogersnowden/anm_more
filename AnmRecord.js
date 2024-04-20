@@ -83,6 +83,46 @@ export default function AnmRecord({userName, productSKU}) {
       border: 'solid 3px #0ff',
       backgroundColor: 'white',
       zIndex: 3,
+      [breakpoints.up('xs')]: {
+        top: '50% !important',
+        left: '50%',
+        height: '52vh',
+        width: '45vh',
+        borderColor: 'green',
+        backgroundColor: 'white',
+      },
+      [breakpoints.up('sm')]: {
+        top: '50% !important',
+        left: '50%',
+        height: '52vh',
+        width: '45vh',
+        borderColor: 'blue',
+        backgroundColor: 'white',
+      },
+      [breakpoints.up('md')]: {
+        top: '52% !important',
+        left: '50%',
+        height: '52vh',
+        width: '45vh',
+        borderColor: 'red',
+        backgroundColor: 'white',
+      },
+      [breakpoints.up('lg')]: {
+        top: '50% !important',
+        left: '50%',
+        height: '52vh',
+        width: '45vh',
+        borderColor: 'yellow',
+        backgroundColor: 'white',
+      },
+      [breakpoints.up('xl')]: {
+        top: '50% !important',
+        left: '40%',
+        height: '52vh',
+        width: '45vh',
+        borderColor: 'orange',
+        backgroundColor: 'white',
+      },
     },
     sliderBox: {
       position: 'absolute',
@@ -94,6 +134,36 @@ export default function AnmRecord({userName, productSKU}) {
       borderStyle: 'solid',
       backgroundColor: 'white',
       zIndex: 2, // Ensuring it's under the upperBezel if they overlap
+      [breakpoints.up('xs')]: {
+        height: '52vh',
+        width: '45vh',
+        borderColor: 'green',
+        backgroundColor: 'white',
+      },
+      [breakpoints.up('sm')]: {
+        height: '52vh',
+        width: '45vh',
+        borderColor: 'blue',
+        backgroundColor: 'white',
+      },
+      [breakpoints.up('md')]: {
+        height: '52vh',
+        width: '45vh',
+        borderColor: 'red',
+        backgroundColor: 'white',
+      },
+      [breakpoints.up('lg')]: {
+        height: '52vh',
+        width: '45vh',
+        borderColor: 'yellow',
+        backgroundColor: 'white',
+      },
+      [breakpoints.up('xl')]: {
+        height: '67vh',
+        width: '45vh',
+        borderColor: 'orange',
+        backgroundColor: 'white',
+      },
     },
     image: {
       position: 'relative',
@@ -103,6 +173,26 @@ export default function AnmRecord({userName, productSKU}) {
       height: '100%',
       objectFit: 'cover', // Cover to ensure aspect ratio is maintained
       objectPosition: 'center', // Center the image within its container
+      [breakpoints.up('xs')]: {
+        height: '100%',
+        width: '100%',
+      },
+      [breakpoints.up('sm')]: {
+        height: '100%',
+        width: '100%',
+      },
+      [breakpoints.up('md')]: {
+        height: '100%',
+        width: '100%',
+      },
+      [breakpoints.up('lg')]: {
+        height: '100%',
+        width: '100%',
+      },
+      [breakpoints.up('xl')]: {
+        height: '100%',
+        width: '100%',
+      },
     },
     titleText: {
       fontSize: '2rem',
