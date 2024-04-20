@@ -73,173 +73,36 @@ export default function AnmRecord({userName, productSKU}) {
       right: '-47% !important',
       zIndex: 1,
      },
-    upperBezel: {
-      border: 'solid 3px #0ff',
+     upperBezel: {
       position: 'absolute',
-      zIndex: 3,
-      paddingTop: '0vh',
-      top: '60% !important',
+      top: '50%',
       left: '50%',
-      topMargin: '10vh',
-      transform: 'translateX(-50%) translateY(-50%)',
-      width: '60vw',
-      height: '80vw',
-      maxHeight: '95%',
-      backgroundColor: 'white !important',
-      color: 'white !important',
-      [breakpoints.up('xs')]: {
-        top: '60% !important',
-        height: '52vh',
-        width: '45vh',
-        borderColor: 'green',
-        backgroundColor: 'white',
-      },
-      [breakpoints.up('sm')]: {
-        top: '60% !important',
-        height: '52vh',
-        width: '45vh',
-        borderColor: 'blue',
-        backgroundColor: 'white',
-      },
-      [breakpoints.up('md')]: {
-        top: '60% !important',
-        height: '52vh',
-        width: '45vh',
-        borderColor: 'red',
-        backgroundColor: 'white',
-      },
-      [breakpoints.up('lg')]: {
-        top: '60% !important',
-        height: '52vh',
-        width: '45vh',
-        borderColor: 'yellow',
-        backgroundColor: 'white',
-      },
-      [breakpoints.up('xl')]: {
-        top: '60% !important',
-        height: '52vh',
-        width: '45vh',
-        borderColor: 'orange',
-        backgroundColor: 'white',
-      },
+      transform: 'translate(-50%, -50%)',
+      width: '35vw', // Width as viewport width
+      height: '52vw', // Height adjusted to maintain 4:3 aspect ratio
+      border: 'solid 3px #0ff',
+      backgroundColor: 'white',
+      zIndex: 3,
     },
     sliderBox: {
       position: 'absolute',
-      paddingTop: '0vh',
-      borderStyle: 'solid',
+      top: '50%',
       left: '50%',
-      topMargin: '10vh',
-      transform: 'translateX(-50%) translateY(-50%)',
-      height: '52vh',
-      width: '45vh',
-      maxHeight: '95%',
+      transform: 'translate(-50%, -50%)',
+      width: '35vw', // Same width as upperBezel to maintain consistency
+      height: '52vw', // Height adjusted to maintain 4:3 aspect ratio
+      borderStyle: 'solid',
       backgroundColor: 'white',
-      [breakpoints.up('xs')]: {
-        height: '52vh',
-        width: '45vh',
-        backgroundColor: 'white',
-      },
-      [breakpoints.up('sm')]: {
-        height: '52vh',
-        width: '45vh',
-        backgroundColor: 'white',
-      },
-      [breakpoints.up('md')]: {
-        height: '52vh',
-        width: '45vh',
-        backgroundColor: 'white',
-      },
-      [breakpoints.up('lg')]: {
-        height: '52vh',
-        width: '45vh',
-        backgroundColor: 'white',
-      },
-      [breakpoints.up('xl')]: {
-        height: '67vh',
-        width: '45vh',
-        backgroundColor: 'white',
-      },
+      zIndex: 2, // Ensuring it's under the upperBezel if they overlap
     },
-image: {
-    position: 'relative',
-    height: '30vh', // Adjust height as necessary
-    width: 'auto', // Auto width for maintaining aspect ratio
-    objectFit: 'cover', // Cover ensures the aspect ratio is maintained without skewing
-    objectPosition: 'center', // Center the image within its container
-    [breakpoints.up('xs')]: {
-      height: '22.5vh', // Adjusted for 4:3 aspect ratio (height is 3/4 of width)
-    },
-    [breakpoints.up('sm')]: {
-      height: '39.75vh', // Adjusted for 4:3 aspect ratio
-    },
-    [breakpoints.up('md')]: {
-      height: '39.375vh', // Adjusted for 4:3 aspect ratio
-    },
-    [breakpoints.up('lg')]: {
-      height: '40.5vh', // Adjusted for 4:3 aspect ratio
-    },
-    [breakpoints.up('xl')]: {
-      height: '49.875vh', // Adjusted for 4:3 aspect ratio
-    },
-},
-      textAloneBox: {
-        backgroundColor: "white",
-        position: 'relative',
-        fontSize: '1.2rem',
-        textAlign: 'left',
-        right: '45%',
-        left: '0%',
-        marginRight: '10px',
-        marginLeft: '10px',
-        bottom: '15%',
-        verticalAlign: 'top',
-        height: '30vh',
-        width: 'auto',
-        [breakpoints.up('xs')]: {
-          height: '0vh',
-          width: 'auto',
-        },
-        [breakpoints.up('sm')]: {
-          height: '0vh',
-          width: '40vh',
-        },
-        [breakpoints.up('md')]: {
-          height: '0vh',
-          width: '40vh',
-        },
-        [breakpoints.up('lg')]: {
-          height: '0vh',
-          width: '44vh',
-        },
-        [breakpoints.up('xl')]: {
-          height: '0vh',
-          width: '40vh',
-        },
-      },
-      textAlone: {
-      backgroundColor: 'white',
-      fontSize: '1.2rem',
-      textAlign: 'left',
+    image: {
       position: 'relative',
-      whiteSpace: "pre-line",
-      verticalAlign: "bottom",
-      marginRight: '5px !important',
-      marginLeft: '5px !important',
-      right: '10%',
-      left: '5%',
-      bottom: '15%',
-      color: 'black',
-    },
-    textOnImage: {
-      fontSize: '1.2rem',
-      position: 'absolute',
-      textAlign: "left",
-      whiteSpace: "pre-line",
-      verticalAlign: "bottom",
-      right: '10%',
-      left: '10%',
-      bottom: '15%',
-      color: 'white',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover', // Cover to ensure aspect ratio is maintained
+      objectPosition: 'center', // Center the image within its container
     },
     titleText: {
       fontSize: '2rem',
@@ -261,8 +124,8 @@ image: {
     },
     recordControls: {
       position: 'absolute',
-      bottom: '8%',
-      left: '40%',
+      bottom: '5%',
+      left: '42%',
       verticalAlign: 'bottom',
       alignItems: 'bottom',
     },
@@ -728,10 +591,6 @@ var z = userBook;
         userBook.bookcontents.map(page => 
           <div class="slider" key={page.image}>
             <img  className={classes.image} alt="Image for a page" src={page.image} />
-            <p></p><p></p>
-            <div className={classes.textAloneBox} >
-            <Typography className={classes.textAlone} variant="subtitle2">{page.text}</Typography>
-            </div>
           </div>
         ))
       }
