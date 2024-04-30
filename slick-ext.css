@@ -1,0 +1,48 @@
+/* This ensures all slick arrow buttons are styled according to your custom design */
+.slick-arrow.slick-next,
+.slick-arrow.slick-prev {
+    background-color: transparent;
+    border-radius: 0%; /* Circular arrows */
+    height: 40px; /* Set height, adjust as necessary */
+    width: 40px; /* Set width, adjust as necessary */
+    display: flex; /* Flexbox for centering the icon inside the arrow */
+    align-items: center; /* Center align items vertically */
+    justify-content: center; /* Center align items horizontally */
+    opacity: 1; /* Slightly transparent */
+    cursor: pointer; /* Pointer cursor on hover */
+    border: none; /* Remove any borders */
+    outline: none; /* Remove outline */
+}
+
+/* Styling for hover state to make arrows more interactive */
+.slick-arrow.slick-next:hover,
+.slick-arrow.slick-prev:hover {
+    background-color: transparent; /* on hover */
+    opacity: 1; /* Fully opaque on hover */
+}
+.slick-arrow.slick-next:hover::before,
+.slick-arrow.slick-prev:hover::before {
+    content: ""; /* Required for pseudo-elements */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 60px; /* Width of the circular hover effect */
+    height: 60px; /* Height of the circular hover effect */
+    background-color: #b0cdfb; /* Light blue background on hover */
+    border-radius: 50%; /* Makes it circular */
+    opacity: .4;
+    transform: translate(-50%, -50%); /* Center the circle within the button */
+    transition: background-color 0.3s; /* Smooth transition for color */
+}
+/* Remove default slick arrow icons */
+.slick-prev::before,
+.slick-next::before {
+    content: none; /* Removes the content of the ::before pseudo-element */
+}
+
+.arrows svg {
+    font-size: 20px; /* This might not work as expected without additional tweaks */
+    width: 40px; /* Directly set the width of the SVG */
+    height: 40px; /* Directly set the height of the SVG */
+    color: black; /* This sets the color of the icon */
+}

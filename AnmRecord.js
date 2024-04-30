@@ -32,11 +32,14 @@ import TinyDotRed from './TinyDotRed';
 import TinyDotBlue from './TinyDotBlue';
 import SaveButton from './SaveButton';
 import RecView from './RecView';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 
 import './App.css';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./styles.css";
+import "./slick-ext.css";
 
 const breakpoints = createBreakpoints({});
 
@@ -565,20 +568,6 @@ var z = userBook;
 
     }, []);
 
-    const NextArrow = () => {
-      return (
-        <div
-        />
-      )
-    };
-    
-    const PrevArrow = () => {
-      return (
-        <div
-        />
-      )
-    };
-
   useEffect(() => {
     console.log("FX 8 setthiswidth emtpy" + playState);
 
@@ -672,6 +661,24 @@ var z = userBook;
 //    console.log("record cancel");
   };
 
+  function NextArrow(props) {
+    const { className, style, onClick } = props;
+    return (
+        <div className={`${className} arrows`} style={{ ...style, display: "block" }} onClick={onClick}>
+            <ArrowForwardIosIcon style={{ fontSize: '20px', color: 'black' }} />
+        </div>
+    );
+}
+
+function PrevArrow(props) {
+    const { className, style, onClick } = props;
+    return (
+        <div className={`${className} arrows`} style={{ ...style, display: "block" }} onClick={onClick}>
+            <ArrowBackIosIcon style={{ fontSize: '20px', color: 'black' }} />
+        </div>
+    );
+}
+      
   // TODO: load cached audio blobs/files, also save recorded files
   const renderSlides = () => {
     console.log("userBook: " + userBook);
@@ -700,6 +707,7 @@ var z = userBook;
                 <IconButton onClick={handleCancel} className={classes.iconButton}>
                   <CancelIcon />
                 </IconButton>
+                <ArrowBackIosIcon />
                 <Slider
                   className={classes.sliderBox}
                   initialSlide={0}
@@ -710,6 +718,8 @@ var z = userBook;
                   dots={false}
                   infinite={false}
                   arrows={true}
+                  nextArrow={<NextArrow/>}
+                  prevArrow={<PrevArrow/>}
                   afterChange={onChangeSlide}
                   onSwipe={onSwipe}
                 >
@@ -718,6 +728,7 @@ var z = userBook;
               </Box>
               <Grid container justify="space-around" className={classes.recordControls}>
               <Grid >
+
         {recText === "Record" ?
           <RecButton onClick={handleRecordClick}/> :
           <RecButtonOff onClick={handleRecordClick}/>
