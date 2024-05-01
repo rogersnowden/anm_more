@@ -267,7 +267,7 @@ const [rightDisabled, setRightDisabled] = useState(false);
 const [currentPageImage, setCurrentPageImage]  = useState();
 const [currentPageText, setCurrentPageText] = useState();
 const [currentPageTextColor, setCurrentPageTextColor] = useState();
-const [currentPageIndex, setCurrentPageIndex]= useState();
+const [currentPageIndex, setCurrentPageIndex]= useState(0);
 const [portrait, setPortrait] = useState(false);
 const [isLoading, setIsLoading] = useState(false); // true for prod
 
@@ -301,6 +301,14 @@ const audioURLArray = [];
 const audioRef= useRef();
 // test axios
 //const j = Axios;
+
+// obtain book length from AuthContext
+useEffect(() => {
+  if (userBook ) {
+    console.log("img list size: " + imgListSize + rightDisabled);
+    setImgListSize(userBook.bookcontents.length);
+  }
+}, [imgListSize]);
 
 // cb func 
 function updateAudioObjArray(thisAudio) {
@@ -415,7 +423,10 @@ const onSwipe = (props) => {
       };  
 
       useEffect(() => { // set image to current position
-        console.log("FX 3 currentPageIndex");
+        console.log("FX 3 currentPageIndex: " + currentPageIndex);
+        if (currentPageIndex && userBook) {
+          setImgListSize(userBook.bookcontents.length);
+        }
       if (completeImgURLArray) {
       console.log("page indx: " + currentPageIndex);
       console.log("curr img: " + completeImgURLArray[currentPageIndex]);
@@ -506,6 +517,7 @@ const onSwipe = (props) => {
     console.log("FX 5 completeImgURLArray");
 
     if (completeImgURLArray) {
+      console.log("img loaded:" + imgListSize);
 //      cacheImages(completeImgURLArray);
       setIsLoading(false);
     }
@@ -517,48 +529,6 @@ const onSwipe = (props) => {
 //      setIsLoading(false);
 //    }
 //  }, [audioURLArray]);
-
-  // read json, iterate through and set up page contents
-  useEffect(() => {
-    console.log("FX 6 bookSetJSON");
-var z = userBook;
-    if (bookSetJSON) { 
-      let thisImgURLArray= [];
-      let thisTextArray= [];
-      let thisTextColorArray= [];
-      // loop each json array element, set up img,txt,audio
-      for (let i=0; i< bookSetJSON.length; i++) {
-//      bookSetJSON.forEach((img) => {
-         //var thisURL= `"`+API_URL + '/' + img.image+`"`;
-         let thisImgURL= BaseURI + 'src/' + bookSetJSON[i].image;
-         console.log('new img url: ' + thisImgURL);
-         let thisText = bookSetJSON[i].text;
-         let thisTextColor = bookSetJSON[i].textColor;
-        thisImgURLArray.push(thisImgURL);
-        thisTextArray.push(thisText);
-        thisTextColorArray.push(thisTextColor);
-        // push audio url to predeclared array
-        audioURLArray.push(bookSetJSON[i].audio);
-        console.log('json stuff loaded');
-      } // loop complete
-        setCompleteImgURLArray(thisImgURLArray);
-        setBookTextArray(thisTextArray);
-        setPageTextColorArray(thisTextColorArray);
-        // cache audio: turn urls into playable objects
-//        cacheAudio();
-        setIsLoading(false);
-        console.log("img array after: " + completeImgURLArray);
-        console.log("book text array after: " + bookTextArray);
-        console.log('audio url array: ' + audioURLArray);
-      
-      setImgListSize(bookSetJSON.length);
-      console.log('list size: ' + imgListSize);
-      // finally, init current page to 0 (cover page)
-      setCurrentPageIndex(0);
-      } else {
-        console.log("bookSetJSON does not exist");
-      }
-    }, [bookSetJSON]);
 
     useEffect(() => {
       console.log("FX 7 setThisWidth:" + playState);
@@ -662,18 +632,18 @@ var z = userBook;
   };
 
   function NextArrow(props) {
-    const { className, style, onClick } = props;
+    const { className, style, onClick, isEnabled } = props;
     return (
-        <div className={`${className} arrows`} style={{ ...style, display: "block" }} onClick={onClick}>
+        <div className={`${className} arrows`} style={{ ...style, display: "block", opacity: isEnabled ? 1 : 0.3 }} onClick={onClick}>
             <ArrowForwardIosIcon style={{ fontSize: '20px', color: 'black' }} />
         </div>
     );
 }
 
 function PrevArrow(props) {
-    const { className, style, onClick } = props;
+    const { className, style, onClick, isEnabled } = props;
     return (
-        <div className={`${className} arrows`} style={{ ...style, display: "block" }} onClick={onClick}>
+        <div className={`${className} arrows`} style={{ ...style, display: "block", opacity: isEnabled ? 1 : 0.3 }} onClick={onClick}>
             <ArrowBackIosIcon style={{ fontSize: '20px', color: 'black' }} />
         </div>
     );
@@ -718,8 +688,9 @@ function PrevArrow(props) {
                   dots={false}
                   infinite={false}
                   arrows={true}
-                  nextArrow={<NextArrow/>}
-                  prevArrow={<PrevArrow/>}
+                  nextArrow={<NextArrow isEnabled={currentPageIndex < userBook.bookcontents.length - 1}/>}
+                  prevArrow={<PrevArrow isEnabled={currentPageIndex > 0}/>}
+//                  beforeChange={handleBeforeChange}
                   afterChange={onChangeSlide}
                   onSwipe={onSwipe}
                 >

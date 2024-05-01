@@ -14,6 +14,7 @@ const AuthProvider = ({ children }) => {
   const [wasCancelled, setWasCancelled] = useState(false);
   const [productSKU, setProductSKU] = useState();
   const [userBook, setUserBook] = useState();
+  const [userBookPageCount, setUserBookPageCount] = useState();
   const [productResponse, setProductResponse] = useState();
 
   console.log("AuthProvider isLoggedIn: ", isLoggedIn);
@@ -32,6 +33,7 @@ const AuthProvider = ({ children }) => {
       wasCancelled, setWasCancelled,
       productSKU, setProductSKU,
       userBook, setUserBook,
+      userBookPageCount, setUserBookPageCount,
       productResponse, setProductResponse,
        }}>
       {children}

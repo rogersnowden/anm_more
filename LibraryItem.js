@@ -4,7 +4,8 @@ import ProdService from "./services/prod.service";
 import './Library.css';
 
 const LibraryItem = ({ item }) => {
-    const { APIURL, productSKU, setProductSKU, setProductResponse, setUserBook, userName } = useContext(AuthContext);
+    const { APIURL, productSKU, setProductSKU, setProductResponse, setUserBook, 
+        setUserBookPageCount, userBookPageCount, userName } = useContext(AuthContext);
     const imageUrl = `${APIURL}products/thumbs/${item.coverimage}`;
 
     const handleItemSelect = (selectedItem) => {
@@ -17,6 +18,7 @@ const LibraryItem = ({ item }) => {
         
     function localizeUserBook(thisBook) {
         let SKU= thisBook.sku;
+        setUserBookPageCount(thisBook.bookcontents.length);
         for (let i=0; i< thisBook.bookcontents.length; i++) {
             let img = thisBook.bookcontents[i].image;
             let aud = thisBook.bookcontents[i].audio;
