@@ -40,6 +40,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./styles.css";
 import "./slick-ext.css";
+import prodService from "./services/prod.service";
 
 const breakpoints = createBreakpoints({});
 
@@ -57,6 +58,7 @@ console.log('theme: ' + theme);
 //export default function AnmRecord({ userName, productSKU }) {
 export default function AnmRecord({userName, productSKU}) {
 
+  //console.log("userName: " + userName + " prodsku: " + productSKU)
   const API_URL = "https://localhost:4000/api/";
   const THIS_BOOK_URL = API_URL + 'users/' + userName + '/mybooks/'  
   + productSKU + '/';
@@ -221,6 +223,7 @@ export default function AnmRecord({userName, productSKU}) {
       left: '42%',
       verticalAlign: 'bottom',
       alignItems: 'bottom',
+      zIndex: '5',
     },
 }));
 
@@ -281,7 +284,7 @@ const [indexVal, setIndexVal] = useState(0);
 
 const [newSlide, setNewSlide] = useState(0);
 const [recText, setRecText] = useState("Record");
-const [recordState, setRecordState] = useState(true);
+const [recordState, setRecordState] = useState(false);
 const [isSpinning, setSpinning] = useState(false);
 const [tinyDotVisible, setTinyDotVisible] = useState(false);
 const [opacityStyle, setPlayOpacity] = useState(0.38);
@@ -310,6 +313,36 @@ useEffect(() => {
   }
 }, [imgListSize]);
 
+useEffect(() => {
+  console.log("loaded userbook: " + userBook, currentPageIndex);
+  // load cache, get audio files as well
+  preloadImagesForNextPages(userBook.bookcontents);
+}, [userBook]);
+
+useEffect(() => {
+  console.log("load audio: " + userName, productSKU);
+  if (userName && productSKU) {
+    console.log(" ready to load audio");
+    prodService.getBookAudio(userName, productSKU)
+    .then(data => {
+        console.log("get user book audio successful", data);
+        var thisAudio= data;
+        setAudioObjArray(data);
+        console.log("set audio obj array");
+    })
+    .catch(error => {
+        console.error("Error fetching audio array:", error);
+    });    
+    console.log("got audio");
+  }
+  // load cache, get audio files as well
+  preloadImagesForNextPages(userBook.bookcontents);
+}, [userName, productSKU]);
+
+useEffect(() => {
+  console.log("hit the audio array");
+}, [audioObjArray]);
+
 // cb func 
 function updateAudioObjArray(thisAudio) {
   console.log("updateAudioObjArray");
@@ -334,27 +367,29 @@ function updateAudioObjArray(thisAudio) {
   
   };
   
-  function preloadImagesForNextPages(currentPageIndex, bookContents) {
+  // grab all images, audio as well, and cache
+  function preloadImagesForNextPages(bookContents) {
     console.log("preloadImageForNextPages 2");
     const head = document.getElementsByTagName('head')[0];
     // Remove existing preload links to avoid clutter and unnecessary preloading
     const existingPreloads = document.querySelectorAll('link[rel="preload"]');
     existingPreloads.forEach(link => head.removeChild(link));
     // Determine the range of pages to preload; adjust according to your needs
-    const startPage = currentPageIndex + 1;
-    const endPage = Math.min(startPage + 2, userBook.bookcontents.length); // Preload next 2 pages, adjust as needed
-    for (let i = startPage; i < endPage; i++) {
+    for (let i = 0; i < bookContents.length; i++) {
       const page = bookContents[i];
+      let aud = bookContents[i].audio;
+      console.log("this page, audio" + aud);
       if (page && page.image) {
         const preloadLink = document.createElement('link');
         preloadLink.rel = 'preload';
         preloadLink.as = 'image';
         preloadLink.href = API_URL + `users/${userName}/mybooks/${userBook.sku}/` + page.image;
-        console.log("preload link: " + preloadLink.href);
+//        console.log("preload link: " + preloadLink.href);
         head.appendChild(preloadLink);
       }
-      console.log("head: " + head);
+//      console.log("head: " + head);
     }
+    console.log("end of cache load");
   };
    
 const { recorderState, ...handlers } = useRecorder({updateAudioObjArray});
@@ -607,12 +642,17 @@ const onSwipe = (props) => {
   };
     
   function handleRecordClick() {
-    console.log("handleRecordClick:" + playState);
-    setRecordState(recordState => !recordState);
-    recordState === true ? 
-      turnOnRecord() :
-      turnOffRecord();
-  };
+    console.log("handleRecordClick, playstate: " + playState + " rec state: " + recordState);
+    setRecordState(prevState => {
+      if (prevState) {
+        turnOffRecord();
+      } else {
+        turnOnRecord();
+      }
+      return !prevState;
+    });
+  }
+  
 
   function handlePlayClick() {
     console.log("handlePlayClick:" + playState);
@@ -699,12 +739,11 @@ function PrevArrow(props) {
               </Box>
               <Grid container justify="space-around" className={classes.recordControls}>
               <Grid >
-
-        {recText === "Record" ?
-          <RecButton onClick={handleRecordClick}/> :
-          <RecButtonOff onClick={handleRecordClick}/>
-          }
-        </Grid>
+                {recText === "Record" ?
+                  <RecButton onClick={handleRecordClick}/> :
+                  <RecButtonOff onClick={handleRecordClick}/>
+                  }
+            </Grid>
         <Grid>
           &nbsp;
         {
@@ -730,4 +769,4 @@ function PrevArrow(props) {
     </ThemeProvider>
   );
   
- }
+ } 

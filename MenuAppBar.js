@@ -153,8 +153,8 @@ const anmShop = () => {
   handleCloseMain();
 };
 
-const anmRecord = () => {
-  setWhichPage(<AnmRecord key={Date.now()} />);
+const anmRecord = ({userName, productSKU}) => {
+  setWhichPage(<AnmRecord key={Date.now()} userName={userName} productSKU={productSKU}/>);
   handleCloseMain();
 };
 const anmAbout = () => {
