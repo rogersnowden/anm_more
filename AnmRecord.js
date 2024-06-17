@@ -341,7 +341,7 @@ useEffect(() => {
 
 useEffect(() => {
   console.log("hit the audio array");
-}, [audioObjArray]);
+}, [audioObjArray]); 
 
 // cb func 
 function updateAudioObjArray(thisAudio) {

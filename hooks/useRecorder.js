@@ -88,7 +88,7 @@ export default function useRecorder(props) {
       recorder.ondataavailable = (e) => {
         chunks.push(e.data);
       };
-
+ 
       recorder.onstop = () => {
         const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
         chunks = [];
