@@ -345,7 +345,7 @@ useEffect(() => {
 
 // cb func 
 function updateAudioObjArray(thisAudio) {
-  console.log("updateAudioObjArray");
+  console.log("updateAudioObjArray" + audioObjArray);
   console.log('new audio: ' + thisAudio);
   console.log('audioObj: ' + audioObjArray);
   console.log("currentPageIndex: " + currentPageIndex);
@@ -356,7 +356,7 @@ function updateAudioObjArray(thisAudio) {
     })
   // set curr ref for playing thing just recorded
   setCurrentAudio(thisAudio);
-  pushAudio();
+  //pushAudio();
   //let newAudioObjArray = audioObjArray;
   //newAudioObjArray[currentPageIndex] = thisAudio;
   //setAudioObjArray(newAudioObjArray);
@@ -375,10 +375,20 @@ function updateAudioObjArray(thisAudio) {
     const existingPreloads = document.querySelectorAll('link[rel="preload"]');
     existingPreloads.forEach(link => head.removeChild(link));
     // Determine the range of pages to preload; adjust according to your needs
+    // audioSet to hold audio object before assign to state object
+    const audioSet = [];
     for (let i = 0; i < bookContents.length; i++) {
       const page = bookContents[i];
-      let aud = bookContents[i].audio;
-      console.log("this page, audio" + aud);
+      console.log("page audio, page " + i + ": " + page.audio);
+      // here we either convert audio url to Audio blob, or new empty Audio
+      if (page.audio) {
+        const audioObject = new Audio(page.audio);
+        audioSet.push(audioObject);
+        } else {
+          const audioObject = new Audio();
+          audioSet.push(audioObject);
+        };
+      console.log("this page, audio" + audioSet);
       if (page && page.image) {
         const preloadLink = document.createElement('link');
         preloadLink.rel = 'preload';
@@ -389,15 +399,16 @@ function updateAudioObjArray(thisAudio) {
       }
 //      console.log("head: " + head);
     }
-    console.log("end of cache load");
+  // shove all audio into state obj array
+    setAudioObjArray(audioSet);
   };
    
-const { recorderState, ...handlers } = useRecorder({updateAudioObjArray});
+const { recorderState, ...handlers } = useRecorder({audioObjArray, updateAudioObjArray});
 
 const { audio } = recorderState;
 
 const onChangeSlide = (newSlide)  => {
-  console.log("onChangeSlide");
+  console.log("onChangeSlide: " + audioObjArray);
   setCurrentPageText(userBook[newSlide]);
   setIndexVal(newSlide);
   setCurrentPageIndex(newSlide);
@@ -413,49 +424,6 @@ const onSwipe = (props) => {
   console.log("onSwipe");
   console.log('swiped');
 };
-
-    function cacheAudio() {
-      console.log("cacheAudio");
-      if (audioURLArray) {
-        if (audioURLArray.length > 0) {
-          // init the target finished array
-          let thisObjArray= [];
-          const getAudio = () => {
-            return new Promise(resolve => {
-                setTimeout(() => resolve(), 100)
-              })
-            }
-          const requestArr = audioURLArray.map(async audioLink => {
-            await getAudio(audioLink);
-            return Axios.get(audioLink)
-                    .then(response => {
-                      let thisAudio = new Audio();
-//                      thisAudio.src= response.data;
-                      thisAudio.src = audioLink;
-                      thisObjArray.push(thisAudio);
-                      setAudioObjArray( arr => [...arr, thisAudio]);
-//                      audioObjArray.push(thisAudio);
-                      console.log('here');
-                    })
-                    .catch(error => console.log(error.toString()))
-            });
-          Promise.all(requestArr).then(() => {
-            setCurrentPageIndex(0);
-            // set curr playable audio to first in array
-            // test first audio obj, set play button accordingly
-            // NB using thisObjArray as state obj still in queue
-            if (thisObjArray[0].src) {
-              setCurrentAudio(thisObjArray[0]);
-              setPlayDisabled(false);
-            }
-            console.log(' done w/ obj array');
-
-            setIsLoading(false);
-            console.log('resolved promise.all, isLoading: ' + isLoading);
-            })
-          }
-        }
-      };  
 
       useEffect(() => { // set image to current position
         console.log("FX 3 currentPageIndex: " + currentPageIndex);
@@ -582,6 +550,7 @@ const onSwipe = (props) => {
   }, []);
 
   function turnOnRecord() {
+    console.log("trn on rec: " + currentAudio);
     setSpinning(true);
     setRecText("Stop");
     setPlayDisabled(true);

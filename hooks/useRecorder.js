@@ -97,6 +97,7 @@ export default function useRecorder(props) {
         var returnAudio= new Audio();
         returnAudio.src = thisAudio;
 //        let j = postAudio(returnAudio);
+console.log("curre audioObjArray: " + props.audioObjArray);
         props.updateAudioObjArray(returnAudio);
 
         setRecorderState((prevState) => {

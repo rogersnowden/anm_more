@@ -25,9 +25,14 @@ const LibraryItem = ({ item }) => {
             thisBook.bookcontents[i].image = 
                 `${APIURL}users/${userName}/mybooks/${SKU}/${img}`;
                 console.log(" thisimageurl: " + thisBook.bookcontents[i].image);
-                thisBook.bookcontents[i].audio = 
-                `${APIURL}users/${userName}/mybooks/${SKU}/${aud}`;
-                console.log(" thisimageurl: " + thisBook.bookcontents[i].audio);
+                if (thisBook.bookcontents[i].audio) {
+                    thisBook.bookcontents[i].audio = 
+                    `${APIURL}users/${userName}/mybooks/${SKU}/${aud}`;
+                console.log("kept audio: " + thisBook.bookcontents[i].audio);
+                } else {
+                    thisBook.bookcontents[i].audio = "";
+                console.log(" no audio: " + thisBook.bookcontents[i].audio);
+                }
         }
     };
 
