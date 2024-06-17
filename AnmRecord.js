@@ -41,6 +41,7 @@ import "slick-carousel/slick/slick-theme.css";
 import "./styles.css";
 import "./slick-ext.css";
 import prodService from "./services/prod.service";
+import { ContentCutOutlined } from "@mui/icons-material";
 
 const breakpoints = createBreakpoints({});
 
@@ -319,25 +320,25 @@ useEffect(() => {
   preloadImagesForNextPages(userBook.bookcontents);
 }, [userBook]);
 
-useEffect(() => {
-  console.log("load audio: " + userName, productSKU);
-  if (userName && productSKU) {
-    console.log(" ready to load audio");
-    prodService.getBookAudio(userName, productSKU)
-    .then(data => {
-        console.log("get user book audio successful", data);
-        var thisAudio= data;
-        setAudioObjArray(data);
-        console.log("set audio obj array");
-    })
-    .catch(error => {
-        console.error("Error fetching audio array:", error);
-    });    
-    console.log("got audio");
-  }
+//useEffect(() => {
+//  console.log("load audio: " + userName, productSKU);
+//  if (userName && productSKU) {
+//    console.log(" ready to load audio");
+//    prodService.getBookAudio(userName, productSKU)
+//    .then(data => {
+//        console.log("get user book audio successful", data);
+//        var thisAudio= data;
+//        setAudioObjArray(data);
+//        console.log("set audio obj array");
+//    })
+//    .catch(error => {
+//        console.error("Error fetching audio array:", error);
+//    });    
+//    console.log("got audio");
+//  }
   // load cache, get audio files as well
-  preloadImagesForNextPages(userBook.bookcontents);
-}, [userName, productSKU]);
+//  preloadImagesForNextPages(userBook.bookcontents);
+//}, [userName, productSKU]);
 
 useEffect(() => {
   console.log("hit the audio array");
@@ -345,10 +346,10 @@ useEffect(() => {
 
 // cb func 
 function updateAudioObjArray(thisAudio) {
-  console.log("updateAudioObjArray" + audioObjArray);
-  console.log('new audio: ' + thisAudio);
-  console.log('audioObj: ' + audioObjArray);
-  console.log("currentPageIndex: " + currentPageIndex);
+  console.log("before updateAudioObjArray" + audioObjArray + " " + audioObjArray.length);
+//  console.log('new audio: ' + thisAudio);
+//  console.log('audioObj: ' + audioObjArray);
+//  console.log("currentPageIndex: " + currentPageIndex);
   setAudioObjArray( arr => {
     return arr.map((item, i) => {
       return i=== currentPageIndex ? thisAudio : item
@@ -356,6 +357,8 @@ function updateAudioObjArray(thisAudio) {
     })
   // set curr ref for playing thing just recorded
   setCurrentAudio(thisAudio);
+  console.log("updateAudioObjArray" + audioObjArray + " " + audioObjArray.length);
+
   //pushAudio();
   //let newAudioObjArray = audioObjArray;
   //newAudioObjArray[currentPageIndex] = thisAudio;
@@ -363,7 +366,7 @@ function updateAudioObjArray(thisAudio) {
   //audioObjArray[currentPageIndex] = thisAudio;
   
   //setAudioObjArray();
-  console.log('updated array: ' + audioObjArray);
+  console.log("after updateAudioObjArray" + audioObjArray + " " + audioObjArray.length);
   
   };
   
@@ -401,6 +404,13 @@ function updateAudioObjArray(thisAudio) {
     }
   // shove all audio into state obj array
     setAudioObjArray(audioSet);
+    setCurrentAudio(audioSet[0]);
+    if (audioSet[0].src != "") {
+      setPlayDisabled(false);
+
+    } else {
+      setPlayDisabled(true);
+    }
   };
    
 const { recorderState, ...handlers } = useRecorder({audioObjArray, updateAudioObjArray});
@@ -412,11 +422,14 @@ const onChangeSlide = (newSlide)  => {
   setCurrentPageText(userBook[newSlide]);
   setIndexVal(newSlide);
   setCurrentPageIndex(newSlide);
+  setCurrentAudio(audioObjArray[newSlide]);
   // set current play Audio
-//  if (audioObjArray[newSlide].src) {
-//    setPlayDisabled(false);
-//  }
-//  setCurrentAudio(audioObjArray[newSlide]);
+  console.log("cur src: " + audioObjArray[newSlide].src);
+  if (audioObjArray[newSlide].src) {
+    setPlayDisabled(false);
+  } else {
+    setPlayDisabled(true);
+  }
   console.log("new slide: " + newSlide);
   };
 
@@ -550,6 +563,7 @@ const onSwipe = (props) => {
   }, []);
 
   function turnOnRecord() {
+    console.log("aud array now: " + audioObjArray);
     console.log("trn on rec: " + currentAudio);
     setSpinning(true);
     setRecText("Stop");
@@ -603,13 +617,29 @@ const onSwipe = (props) => {
 
   function turnOnPlay() {
     console.log("turnOnPlay:" + playState);
+    console.log("play:" + currentAudio);
+    console.log("play index:" + currentPageIndex);
+    console.log("aud array:" + audioObjArray);
 
-    currentAudio.play();
+
+    currentAudio.play().then(() => {
+      console.log("play time");
+    }).catch(error => {
+      console.error("Playback failed:", error);
+      // Handle the error gracefully, e.g., show a message to the user or load a fallback audio
+      handlePlaybackError(error);
+    });
     console.log("play time");
    // audioArray[currentPageIndex].current.play();
-
   };
     
+  function handlePlaybackError(error) {
+    // Implement your error handling logic here
+    // For example, display an error message to the user
+    alert("An error occurred during audio playback. Please record new audio.");
+    setPlayDisabled(true);
+  };
+
   function handleRecordClick() {
     console.log("handleRecordClick, playstate: " + playState + " rec state: " + recordState);
     setRecordState(prevState => {
