@@ -99,6 +99,26 @@ async getBookAudio(userName, productSKU) {
   }
 }
 
+async saveAudioFiles(userName, productSKU, audioFiles) {
+  const formData = new FormData();
+  formData.append('userName', userName);
+  formData.append('productSKU', productSKU);
+  audioFiles.forEach((file, index) => {
+    formData.append(`audioFile${index}`, file);
+  });
+  try {
+    const response = await axiosInstance.post('saveAudioFiles', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error in saveAudioFiles:", error);
+    throw error;
+  }
+}
+
   getprofile(username) {
     console.log("API_URL: " + API_URL);
     var result = axios

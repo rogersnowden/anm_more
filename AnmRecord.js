@@ -298,9 +298,6 @@ const [isPlaying, setIsPlaying] = useState(false);
 
 const [audioObjArray, setAudioObjArray] = useState([]);
 const [currentAudio, setCurrentAudio] = useState();
-//const audioObjArray = [];
-// working var to load pre-recorded audio url, to convert to Audio()
-const audioURLArray = [];
 
 const audioRef= useRef();
 // test axios
@@ -347,6 +344,8 @@ useEffect(() => {
 // cb func 
 function updateAudioObjArray(thisAudio) {
   console.log("before updateAudioObjArray" + audioObjArray + " " + audioObjArray.length);
+  // new audio, needs writing, set dirty bit.
+  thisAudio.dirty= true;
 //  console.log('new audio: ' + thisAudio);
 //  console.log('audioObj: ' + audioObjArray);
 //  console.log("currentPageIndex: " + currentPageIndex);
@@ -382,16 +381,17 @@ function updateAudioObjArray(thisAudio) {
     const audioSet = [];
     for (let i = 0; i < bookContents.length; i++) {
       const page = bookContents[i];
+      let audioObject;
       console.log("page audio, page " + i + ": " + page.audio);
       // here we either convert audio url to Audio blob, or new empty Audio
       if (page.audio) {
-        const audioObject = new Audio(page.audio);
-        audioSet.push(audioObject);
+        audioObject = new Audio(page.audio);
         } else {
-          const audioObject = new Audio();
-          audioSet.push(audioObject);
+          audioObject = new Audio();
         };
-      console.log("this page, audio" + audioSet);
+        audioObject.dirty = false;
+        audioSet.push(audioObject);
+        console.log("this page, audio" + audioSet);
       if (page && page.image) {
         const preloadLink = document.createElement('link');
         preloadLink.rel = 'preload';
@@ -419,6 +419,10 @@ const { audio } = recorderState;
 
 const onChangeSlide = (newSlide)  => {
   console.log("onChangeSlide: " + audioObjArray);
+  if (audioObjArray[currentPageIndex].dirty) {
+    // save just-rec audio to server, use web worker if needed
+    console.log("dirty audio to save now");
+  };
   setCurrentPageText(userBook[newSlide]);
   setIndexVal(newSlide);
   setCurrentPageIndex(newSlide);
@@ -538,13 +542,6 @@ const onSwipe = (props) => {
       setIsLoading(false);
     }
   }, [completeImgURLArray]);
-
-//  useEffect(() => {
-//    if (audioURLArray) {
-//      cacheAudio();
-//      setIsLoading(false);
-//    }
-//  }, [audioURLArray]);
 
     useEffect(() => {
       console.log("FX 7 setThisWidth:" + playState);
