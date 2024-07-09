@@ -1,9 +1,6 @@
-// useRecorder.js hook
-
 import { useState, useEffect } from "react";
 import { startRecording, saveRecording } from "../handlers/recorder-controls";
 import Axios from "axios";
-
 
 const initialState = {
   recordingMinutes: 0,
@@ -61,23 +58,6 @@ export default function useRecorder(props) {
       });
   }, [recorderState.mediaStream]);
 
-  const postAudio = (returnAudio) => {
-    let src = returnAudio.src;
-    console.log('post it: ' + src);
-    let fData = new FormData();
-    fData.append("file", src);
-    return Axios 
-      .post("http://localhost:80/upload_audio.php", fData, {
-        headers: {
-      "Content-Type": "multipart/form-data",
-      },
-    })
-    .then((res) => {
-      console.log('res: ' + res);
-      return res;
-    });
-  };
-
   useEffect(() => {
     const recorder = recorderState.mediaRecorder;
     let chunks = [];
@@ -88,26 +68,31 @@ export default function useRecorder(props) {
       recorder.ondataavailable = (e) => {
         chunks.push(e.data);
       };
- 
+
       recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
+        // Create a Blob with the correct MIME type for .wav files
+        const blob = new Blob(chunks, { type: "audio/wav" });
         chunks = [];
-        var thisAudio = window.URL.createObjectURL(blob);
-        
-        var returnAudio= new Audio();
-        returnAudio.src = thisAudio;
-//        let j = postAudio(returnAudio);
-console.log("curre audioObjArray: " + props.audioObjArray);
-        props.updateAudioObjArray(returnAudio);
+        const audioURL = window.URL.createObjectURL(blob);
+
+        const returnAudio = new Audio();
+        returnAudio.src = audioURL;
+
+        console.log("current audioObjArray: " + props.audioObjArray);
+        props.updateAudioObjArray(returnAudio, blob);
 
         setRecorderState((prevState) => {
           if (prevState.mediaRecorder)
             return {
               ...initialState,
-              audio: window.URL.createObjectURL(blob),
+              audio: audioURL,
             };
           else return initialState;
         });
+
+        // save blob to server NB: needs api fix, but right place to do the save
+        props.saveAudioFile(blob);
+               // Save the audio file to the server
       };
     }
     return () => {

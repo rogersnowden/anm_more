@@ -17,7 +17,6 @@ import { TextareaAutosize } from '@mui/material';
 import { Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { Box } from '@mui/material';
-import Axios from "axios";
 import Spinner from './Spinner_ANM';
 
 //import { useReactMediaRecorder } from "react-media-recorder";
@@ -240,16 +239,9 @@ const [thisWidth, setThisWidth]= useState(window.outerWidth);
 
 const classes=useStyles();
 
-const instance = Axios.create({
-  baseURL: window.location.href,
-  timeout: 10000,
-  headers: {'Access-Control-Allow-Origin': '*'},
-});
 
 const UserBase = "cust/users/thisUser/collection/thisBook/";
 
-//const { userName, setUserName } = useContext(AuthContext);
-//const { productSKU, setProductSKU } = useContext(AuthContext);
 const { firstName, setFirstName } = useContext(AuthContext);
 const { isVerified, setIsVerified } = useContext(AuthContext);
 const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
@@ -297,11 +289,11 @@ const [audioEnded, setAudioEnded] = useState(false);
 const [isPlaying, setIsPlaying] = useState(false);
 
 const [audioObjArray, setAudioObjArray] = useState([]);
+const [audioNameArray, setAudioNameArray] = useState([]);
 const [currentAudio, setCurrentAudio] = useState();
+const [audioBlob, setAudioBlob] = useState(null);
 
 const audioRef= useRef();
-// test axios
-//const j = Axios;
 
 // obtain book length from AuthContext
 useEffect(() => {
@@ -317,26 +309,6 @@ useEffect(() => {
   preloadImagesForNextPages(userBook.bookcontents);
 }, [userBook]);
 
-//useEffect(() => {
-//  console.log("load audio: " + userName, productSKU);
-//  if (userName && productSKU) {
-//    console.log(" ready to load audio");
-//    prodService.getBookAudio(userName, productSKU)
-//    .then(data => {
-//        console.log("get user book audio successful", data);
-//        var thisAudio= data;
-//        setAudioObjArray(data);
-//        console.log("set audio obj array");
-//    })
-//    .catch(error => {
-//        console.error("Error fetching audio array:", error);
-//    });    
-//    console.log("got audio");
-//  }
-  // load cache, get audio files as well
-//  preloadImagesForNextPages(userBook.bookcontents);
-//}, [userName, productSKU]);
-
 useEffect(() => {
   console.log("hit the audio array");
 }, [audioObjArray]); 
@@ -346,7 +318,15 @@ function updateAudioObjArray(thisAudio) {
   console.log("before updateAudioObjArray" + audioObjArray + " " + audioObjArray.length);
   // new audio, needs writing, set dirty bit.
   thisAudio.dirty= true;
-//  console.log('new audio: ' + thisAudio);
+
+    // Extract the blob from the audio object
+    fetch(thisAudio.src)
+    .then(res => res.blob())
+    .then(blob => {
+      setAudioBlob(blob);
+    });
+
+  //  console.log('new audio: ' + thisAudio);
 //  console.log('audioObj: ' + audioObjArray);
 //  console.log("currentPageIndex: " + currentPageIndex);
   setAudioObjArray( arr => {
@@ -357,14 +337,6 @@ function updateAudioObjArray(thisAudio) {
   // set curr ref for playing thing just recorded
   setCurrentAudio(thisAudio);
   console.log("updateAudioObjArray" + audioObjArray + " " + audioObjArray.length);
-
-  //pushAudio();
-  //let newAudioObjArray = audioObjArray;
-  //newAudioObjArray[currentPageIndex] = thisAudio;
-  //setAudioObjArray(newAudioObjArray);
-  //audioObjArray[currentPageIndex] = thisAudio;
-  
-  //setAudioObjArray();
   console.log("after updateAudioObjArray" + audioObjArray + " " + audioObjArray.length);
   
   };
@@ -379,6 +351,7 @@ function updateAudioObjArray(thisAudio) {
     // Determine the range of pages to preload; adjust according to your needs
     // audioSet to hold audio object before assign to state object
     const audioSet = [];
+    const audioNames = [];
     for (let i = 0; i < bookContents.length; i++) {
       const page = bookContents[i];
       let audioObject;
@@ -390,6 +363,9 @@ function updateAudioObjArray(thisAudio) {
           audioObject = new Audio();
         };
         audioObject.dirty = false;
+        // save to local array
+        let thisName = 'page' + currentPageIndex + 'audio';
+        audioNames.push(thisName);
         audioSet.push(audioObject);
         console.log("this page, audio" + audioSet);
       if (page && page.image) {
@@ -404,23 +380,46 @@ function updateAudioObjArray(thisAudio) {
     }
   // shove all audio into state obj array
     setAudioObjArray(audioSet);
+    // grab root filenames as well
+    setAudioNameArray(audioNames);
     setCurrentAudio(audioSet[0]);
     if (audioSet[0].src != "") {
       setPlayDisabled(false);
-
     } else {
       setPlayDisabled(true);
     }
   };
    
-const { recorderState, ...handlers } = useRecorder({audioObjArray, updateAudioObjArray});
+    // Function to handle saving the audio Blob
+    // binary Blob gets passed in, or must convert HTMLAudioElement to blob first
+    // depending on call point, might need to test blob first, then use or convert first
+    const saveAudioFile = (blob) => {
+      prodService.saveAudioFile(userName, productSKU, currentPageIndex, blob)
+        .then((response) => {
+          console.log("File saved successfully", response);
+        })
+        .catch((error) => {
+          console.error("Error saving file", error);
+        });
+    };
+  
+  // Integrate useRecorder hook
+  const { recorderState, ...handlers } = useRecorder({
+    audioObjArray, 
+    updateAudioObjArray, 
+    saveAudioFile // Pass the saveAudioFile function to useRecorder
+  });
 
 const { audio } = recorderState;
+
 
 const onChangeSlide = (newSlide)  => {
   console.log("onChangeSlide: " + audioObjArray);
   if (audioObjArray[currentPageIndex].dirty) {
     // save just-rec audio to server, use web worker if needed
+    console.log("Audi name: " + audioNameArray[currentPageIndex]);
+    // prefer to save file from useRecorder cb, b/c of 'end point' problem
+    //prodService.saveAudioFile(userName, productSKU, currentPageIndex, audioObjArray[currentPageIndex]);
     console.log("dirty audio to save now");
   };
   setCurrentPageText(userBook[newSlide]);
@@ -437,7 +436,7 @@ const onChangeSlide = (newSlide)  => {
   console.log("new slide: " + newSlide);
   };
 
-const onSwipe = (props) => {
+  const onSwipe = (props) => {
   console.log("onSwipe");
   console.log('swiped');
 };
@@ -505,30 +504,30 @@ const onSwipe = (props) => {
     }, []);
 
   // post audio to server
-    function pushAudio () {
-      var form = new FormData();
-      let blob = new Blob([currentAudio], {type: "audio/wav"});
-      let aFile = new File([blob], 'recording.wav');
-      const data = {
-        "user" : "test",
-      };
-      form.append("files.file", aFile);
-      form.append('data', JSON.stringify(data));
-      instance.post(instance.baseURL + '/file_upload.pl', 
-        {form}, 
-        {headers : {
-          'Access-Control-Allow-Origin': '*'
-        }}
-      )
-      .then(function (response) {
-        // handle success
-        console.log('did post');
-      })
-      .catch(function (error) {
-        // handle error
-        console.log(error);
-      })
-    };
+//    function pushAudio () {
+//      var form = new FormData();
+//      let blob = new Blob([currentAudio], {type: "audio/wav"});
+//      let aFile = new File([blob], 'recording.wav');
+//      const data = {
+//        "user" : "test",
+//      };
+//      form.append("files.file", aFile);
+//      form.append('data', JSON.stringify(data));
+//      instance.post(instance.baseURL + '/file_upload.pl', 
+//        {form}, 
+//        {headers : {
+//          'Access-Control-Allow-Origin': '*'
+//        }}
+//      )
+//      .then(function (response) {
+//        // handle success
+//        console.log('did post');
+//      })
+//      .catch(function (error) {
+//        // handle error
+//        console.log(error);
+//      })
+//    };
 
   
   //TODO Create array of cached audio obj from prev sessions
