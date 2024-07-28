@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { startRecording, saveRecording } from "../handlers/recorder-controls";
-import Axios from "axios";
 
 const initialState = {
   recordingMinutes: 0,
@@ -53,7 +52,9 @@ export default function useRecorder(props) {
       setRecorderState((prevState) => {
         return {
           ...prevState,
-          mediaRecorder: new MediaRecorder(prevState.mediaStream),
+          mediaRecorder: new MediaRecorder(prevState.mediaStream, {
+            mimeType: 'audio/webm' // Set mimeType to audio/webm
+          }),
         };
       });
   }, [recorderState.mediaStream]);
@@ -70,8 +71,7 @@ export default function useRecorder(props) {
       };
 
       recorder.onstop = () => {
-        // Create a Blob with the correct MIME type for .wav files
-        const blob = new Blob(chunks, { type: "audio/wav" });
+        const blob = new Blob(chunks, { type: "audio/webm" });
         chunks = [];
         const audioURL = window.URL.createObjectURL(blob);
 
@@ -90,9 +90,7 @@ export default function useRecorder(props) {
           else return initialState;
         });
 
-        // save blob to server NB: needs api fix, but right place to do the save
         props.saveAudioFile(blob);
-               // Save the audio file to the server
       };
     }
     return () => {
@@ -100,9 +98,16 @@ export default function useRecorder(props) {
     };
   }, [recorderState.mediaRecorder]);
 
+  const stopRecording = () => {
+    if (recorderState.mediaRecorder) {
+      recorderState.mediaRecorder.stop();
+    }
+  };
+
   return {
     recorderState,
     startRecording: () => startRecording(setRecorderState),
+    stopRecording,
     cancelRecording: () => setRecorderState(initialState),
     saveRecording: () => saveRecording(recorderState.mediaRecorder),
   };

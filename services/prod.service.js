@@ -100,18 +100,16 @@ async getBookAudio(userName, productSKU) {
 }
 
 async saveAudioFile(userName, productSKU, currentPageIndex, audioBlob) {
-  const url = new URL('https://localhost:4000/api/saveAudioFile');
-  url.searchParams.append('userName', userName);
-  url.searchParams.append('productSKU', productSKU);
-  url.searchParams.append('currentPageIndex', currentPageIndex);
+  const formData = new FormData();
+  formData.append('audioFile', audioBlob);
+  formData.append('userName', userName);
+  formData.append('productSKU', productSKU);
+  formData.append('currentPageIndex', currentPageIndex);
 
   try {
-    const response = await fetch(url, {
+    const response = await fetch('https://localhost:4000/api/saveAudioFile', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/octet-stream',
-      },
-      body: audioBlob,
+      body: formData,
     });
     const data = await response.json();
     console.log('File saved successfully', data);

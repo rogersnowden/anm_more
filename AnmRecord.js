@@ -404,11 +404,27 @@ function updateAudioObjArray(thisAudio) {
     };
   
   // Integrate useRecorder hook
-  const { recorderState, ...handlers } = useRecorder({
-    audioObjArray, 
-    updateAudioObjArray, 
-    saveAudioFile // Pass the saveAudioFile function to useRecorder
-  });
+//  const { recorderState, ...handlers } = useRecorder({
+//    audioObjArray, 
+//    updateAudioObjArray, 
+//    saveAudioFile // Pass the saveAudioFile function to useRecorder
+//  });
+const { recorderState, startRecording, stopRecording, audioBlob: recordedAudioBlob, ...handlers } = useRecorder({
+  updateAudioObjArray: (audioElement, blob) => {
+    // Update your state with the new audio element and blob
+    setAudioObjArray((arr) => {
+      return arr.map((item, i) => (i === currentPageIndex ? audioElement : item));
+    });
+    setCurrentAudio(audioElement);
+  },
+  saveAudioFile // pass saveAudioFile func to useRecorder
+});
+
+useEffect(() => {
+  if (recordedAudioBlob) {
+    console.log(recordedAudioBlob);
+  }
+}, [recordedAudioBlob]);
 
 const { audio } = recorderState;
 
@@ -564,13 +580,13 @@ const onChangeSlide = (newSlide)  => {
     setSpinning(true);
     setRecText("Stop");
     setPlayDisabled(true);
-    handlers.startRecording();
+    startRecording();
   };
 
   function turnOffRecord() {
     console.log('rec state: ' + recorderState);
     
-    handlers.saveRecording();
+    stopRecording();
     //const recFile = new File([audioRef.current.src], 'fredd.wav', { type: "audio/wav" });
     //let thisMediaBlobURL = audioRef.current.src;
     //bookSetJSON[currentPageIndex].audio= thisMediaBlobURL;
