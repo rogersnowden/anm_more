@@ -99,9 +99,9 @@ async getBookAudio(userName, productSKU) {
   }
 }
 
-async saveAudioFile(userName, productSKU, currentPageIndex, audioBlob) {
+async saveAudioFile(userName, productSKU, currentPageIndex, audioBlob, fileExtension) {
   const formData = new FormData();
-  formData.append('audioFile', audioBlob);
+  formData.append('audioFile', audioBlob, `audio.${fileExtension}`);
   formData.append('userName', userName);
   formData.append('productSKU', productSKU);
   formData.append('currentPageIndex', currentPageIndex);
@@ -117,6 +117,7 @@ async saveAudioFile(userName, productSKU, currentPageIndex, audioBlob) {
     console.error('Error saving file', error);
   }
 }
+
 
   getprofile(username) {
     console.log("API_URL: " + API_URL);

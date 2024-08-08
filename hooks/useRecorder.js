@@ -10,6 +10,17 @@ const initialState = {
   audio: null,
 };
 
+const getMimeType = () => {
+  const userAgent = navigator.userAgent;
+  // comment next line for debug or not
+//  return {mimeType: 'audio/wav', extension: 'wav'};
+  if (/Safari/.test(userAgent) && !/Chrome/.test(userAgent)) {
+    return { mimeType: 'audio/wav', extension: 'wav' };
+  } else {
+    return { mimeType: 'audio/webm', extension: 'webm' };
+  }
+};
+
 export default function useRecorder(props) {
   const [recorderState, setRecorderState] = useState(initialState);
 
@@ -48,13 +59,12 @@ export default function useRecorder(props) {
   });
 
   useEffect(() => {
+    const { mimeType } = getMimeType();
     if (recorderState.mediaStream)
       setRecorderState((prevState) => {
         return {
           ...prevState,
-          mediaRecorder: new MediaRecorder(prevState.mediaStream, {
-            mimeType: 'audio/webm' // Set mimeType to audio/webm
-          }),
+          mediaRecorder: new MediaRecorder(prevState.mediaStream, { mimeType }),
         };
       });
   }, [recorderState.mediaStream]);
@@ -71,7 +81,8 @@ export default function useRecorder(props) {
       };
 
       recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: "audio/webm" });
+        const { mimeType, extension } = getMimeType();
+        const blob = new Blob(chunks, { type: mimeType });
         chunks = [];
         const audioURL = window.URL.createObjectURL(blob);
 
@@ -79,7 +90,7 @@ export default function useRecorder(props) {
         returnAudio.src = audioURL;
 
         console.log("current audioObjArray: " + props.audioObjArray);
-        props.updateAudioObjArray(returnAudio, blob);
+        props.updateAudioObjArray(returnAudio, blob, extension);
 
         setRecorderState((prevState) => {
           if (prevState.mediaRecorder)
@@ -90,7 +101,7 @@ export default function useRecorder(props) {
           else return initialState;
         });
 
-        props.saveAudioFile(blob);
+        props.saveAudioFile(blob, extension);
       };
     }
     return () => {
