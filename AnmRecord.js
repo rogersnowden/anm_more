@@ -1,4 +1,4 @@
-// AnmRecord
+// AnmRecord js
 import React, { useState, useEffect, useRef, useContext } from "react";
 import ProdService from "./services/prod.service";
 import { AuthContext } from './AuthContext';
@@ -519,33 +519,6 @@ const onChangeSlide = (newSlide)  => {
       console.log("page trans event")})
     }, []);
 
-  // post audio to server
-//    function pushAudio () {
-//      var form = new FormData();
-//      let blob = new Blob([currentAudio], {type: "audio/wav"});
-//      let aFile = new File([blob], 'recording.wav');
-//      const data = {
-//        "user" : "test",
-//      };
-//      form.append("files.file", aFile);
-//      form.append('data', JSON.stringify(data));
-//      instance.post(instance.baseURL + '/file_upload.pl', 
-//        {form}, 
-//        {headers : {
-//          'Access-Control-Allow-Origin': '*'
-//        }}
-//      )
-//      .then(function (response) {
-//        // handle success
-//        console.log('did post');
-//      })
-//      .catch(function (error) {
-//        // handle error
-//        console.log(error);
-//      })
-//    };
-
-  
   //TODO Create array of cached audio obj from prev sessions
 
   useEffect(() => {
@@ -633,7 +606,11 @@ const onChangeSlide = (newSlide)  => {
     console.log("play index:" + currentPageIndex);
     console.log("aud array:" + audioObjArray);
 
-
+if (currentAudio.play()) {
+  console.log("can play");
+} else {
+  console.log("cannot play");
+}
     currentAudio.play().then(() => {
       console.log("play time");
     }).catch(error => {

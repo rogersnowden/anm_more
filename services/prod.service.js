@@ -70,34 +70,33 @@ class ProdService {
   }
 
 // Assuming axiosInstance is already configured and imported
+//async getBookAudio(userName, productSKU) {
+//  try {
+//      const response = await axiosInstance.post('getUserBookAudio', { userName, productSKU });
+//      const audiosBase64 = response.data;
+//
+//      // Convert base64 encoded data to blobs for rendering as audio
+//      const audios = audiosBase64.map(audio => {
+//          const byteCharacters = atob(audio.data.split(',')[1]);
+//          const byteArrays = [];
+//
+//          for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
+//              const slice = byteCharacters.slice(offset, offset + 1024);
+//              const byteNumbers = new Array(slice.length).fill().map((_, i) => slice.charCodeAt(i));
+//              byteArrays.push(new Uint8Array(byteNumbers));
+//          }
+//
+//          const blob = new Blob(byteArrays, { type: 'audio/wav' });
+//          const audioUrl = URL.createObjectURL(blob);
+//          return { filename: audio.filename, url: audioUrl };
+//      });
 
-async getBookAudio(userName, productSKU) {
-  try {
-      const response = await axiosInstance.post('getUserBookAudio', { userName, productSKU });
-      const audiosBase64 = response.data;
-
-      // Convert base64 encoded data to blobs for rendering as audio
-      const audios = audiosBase64.map(audio => {
-          const byteCharacters = atob(audio.data.split(',')[1]);
-          const byteArrays = [];
-
-          for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
-              const slice = byteCharacters.slice(offset, offset + 1024);
-              const byteNumbers = new Array(slice.length).fill().map((_, i) => slice.charCodeAt(i));
-              byteArrays.push(new Uint8Array(byteNumbers));
-          }
-
-          const blob = new Blob(byteArrays, { type: 'audio/wav' });
-          const audioUrl = URL.createObjectURL(blob);
-          return { filename: audio.filename, url: audioUrl };
-      });
-
-      return audios;
-  } catch (error) {
-      console.error("Error in getBookAudio:", error);
-      throw error;
-  }
-}
+//      return audios;
+//  } catch (error) {
+//      console.error("Error in getBookAudio:", error);
+//      throw error;
+//  }
+//}
 
 async saveAudioFile(userName, productSKU, currentPageIndex, audioBlob, fileExtension) {
   const formData = new FormData();
