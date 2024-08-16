@@ -410,42 +410,16 @@ function updateAudioObjArray(thisAudio) {
     // Function to handle saving the audio Blob
     // binary Blob gets passed in, or must convert HTMLAudioElement to blob first
     // depending on call point, might need to test blob first, then use or convert first
-    const saveAudioFile = async (blob) => {
-      try {
-        const response = await prodService.saveAudioFile(userName, productSKU, currentPageIndex, blob);
-        console.log("File saved successfully", response);
-    
-        // Construct the cache-busting URL
-        const newAudioUrl = `${API_URL}users/${userName}/mybooks/${productSKU}/page${currentPageIndex}audio.mp3?t=${new Date().getTime()}`;
-    
-        // Fetch the new audio file to reload it into the browser cache
-        const newAudio = await reloadAudio(newAudioUrl);
-    
-        // Update the current audio object and enable the play button
-        updateAudioObjArray(newAudio);
-        setPlayDisabled(false);
-      } catch (error) {
-        console.error("Error saving file", error);
-      }
+    const saveAudioFile = (blob) => {
+      prodService.saveAudioFile(userName, productSKU, currentPageIndex, blob)
+        .then((response) => {
+          console.log("File saved successfully", response);
+        })
+        .catch((error) => {
+          console.error("Error saving file", error);
+        });
     };
-
-    const reloadAudio = async (audioUrl) => {
-      try {
-        // Fetch the updated audio file
-        const response = await fetch(audioUrl, { cache: "reload" });
-        if (!response.ok) {
-          throw new Error('Failed to fetch updated audio');
-        }
-    
-        // Create a new Audio object with the updated file
-        const newAudio = new Audio(audioUrl);
-        return newAudio;
-      } catch (error) {
-        console.error("Error fetching updated audio", error);
-        throw error;
-      }
-    };
-    
+  
   // Integrate useRecorder hook
 //  const { recorderState, ...handlers } = useRecorder({
 //    audioObjArray, 
@@ -609,22 +583,22 @@ const onChangeSlide = (newSlide) => {
     startRecording();
   };
 
-  // immed upon stop recording, save audio to server, then reload
-  // Server processes, trims, etc, so need to reload new file
-  // for playback
   function turnOffRecord() {
-    stopRecording();
+    console.log('rec state: ' + recorderState);
     
-    // Save the recording to the server
-    saveAudioFile(recordedAudioBlob).then(() => {
-      setTinyDotVisible(false);
-      setPlayOpacity(1);
-      setRecText("Record");
-    }).catch(error => {
-      console.error("Error processing and reloading audio:", error);
-    });
-  }
-  
+    stopRecording();
+    //const recFile = new File([audioRef.current.src], 'fredd.wav', { type: "audio/wav" });
+    //let thisMediaBlobURL = audioRef.current.src;
+    //bookSetJSON[currentPageIndex].audio= thisMediaBlobURL;
+//    audioArray[currentPageIndex] = audioRef;
+    setTinyDotVisible(false);
+    setPlayOpacity(1);
+    setPlayDisabled(false);
+    setRecText("Record");
+
+    console.log("record OFF");
+  };
+
   function pausePlay() {
     console.log("pausePlay:" + playState);
     audioObjArray[currentPageIndex].current.pause();
@@ -728,7 +702,7 @@ function PrevArrow(props) {
     if (userBook) {
       return(
         userBook.bookcontents.map(page => 
-          <div className="slider" key={page.image}>
+          <div class="slider" key={page.image}>
             <img  className={classes.image} alt="Image for a page" src={page.image} />
           </div>
         ))
