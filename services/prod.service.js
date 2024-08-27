@@ -13,6 +13,7 @@ console.log("cookie: " + cookie);
 
 class ProdService {
 
+  // status: 'Ready to Record', 'Recorded', 'Shared'
   async getLibrary(userName) {
     try {
       const response = await axiosInstance.post('getLibrary', { userName });
@@ -42,7 +43,7 @@ class ProdService {
 
       // Convert base64 encoded data to blobs for rendering as images
       const images = imagesBase64.map(image => {
-        const byteCharacters = atob(image.data.split(',')[1]);
+        const byteCharacters = (image.data.split(',')[1]);
         const byteArrays = [];
 
         for (let offset = 0; offset < byteCharacters.length; offset += 1024) {

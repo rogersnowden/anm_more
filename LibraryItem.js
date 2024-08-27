@@ -1,10 +1,11 @@
+// LibraryItem.js
 import React, { useContext } from 'react';
 import { AuthContext } from './AuthContext';
 import ProdService from "./services/prod.service";
 import './Library.css';
 
 const LibraryItem = ({ item }) => {
-    const { APIURL, productSKU, setProductSKU, setProductResponse, setUserBook, 
+    const { APIURL, productSKU, setProductSKU, productResponse, setProductResponse, setUserBook, 
         setUserBookPageCount, userBookPageCount, userName } = useContext(AuthContext);
     const imageUrl = `${APIURL}products/thumbs/${item.coverimage}`;
 
@@ -13,6 +14,7 @@ const LibraryItem = ({ item }) => {
         let SKU = selectedItem.sku;
         getUserBook(userName, SKU);
         setProductSKU(SKU)
+        setProductResponse(selectedItem.status);
         // You can now access selectedItem.title, selectedItem.description, etc.
     };
         
@@ -51,8 +53,6 @@ const LibraryItem = ({ item }) => {
             var thisBook= data;
             localizeUserBook(thisBook);
             setUserBook(data);
-            console.log("set user book");
-            setProductResponse('record');
             }
         })
         .catch(error => {

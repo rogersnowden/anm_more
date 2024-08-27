@@ -34,6 +34,7 @@ import AnmRegister from './AnmRegister';
 import AnmPasswordRecover from './AnmPasswordRecover';
 import AnmBook from './AnmBook';
 import AnmRecord from './AnmRecord';
+import AnmShare from './AnmShare';
 import AnmShop from './AnmShop';
 import AnmNotifications from './AnmNotifications';
 
@@ -102,10 +103,9 @@ export default function MenuAppBar (props)  {
       console.log(" sku set, found");
       if (productResponse == ('record')) {
         anmRecord({userName, productSKU});
-//        anmRecord({userBook});
       }
-      else if (productResponse == ('playshare')) {
-        anmBook();
+      else if (productResponse == ('share')) {
+        anmShare(userName, productSKU);
       }
     }
   }, [userBook, userName, productSKU, productResponse]);
@@ -157,6 +157,12 @@ const anmRecord = ({userName, productSKU}) => {
   setWhichPage(<AnmRecord key={Date.now()} userName={userName} productSKU={productSKU}/>);
   handleCloseMain();
 };
+
+const anmShare = ({userName, productSKU}) => {
+  setWhichPage(<AnmShare key={Date.now()} userName={userName} productSKU={productSKU}/>);
+  handleCloseMain();
+};
+
 const anmAbout = () => {
   setWhichPage(<AnmAbout key={Date.now()} />);
   handleCloseMain();
