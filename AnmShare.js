@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { makeStyles } from '@mui/styles';
 import createBreakpoints from '@mui/system/createTheme/createBreakpoints';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Box, Button, TextField, Typography, IconButton, Grid, List, ListItem, ListItemText } from '@mui/material';
+import { Box, Button, TextField, Typography, IconButton, Grid, List, ListItem, ListItemText, Pagination, Paper } from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { AuthContext } from './AuthContext';
 import Spinner from './Spinner_ANM';
@@ -84,14 +84,63 @@ const useStyles = makeStyles((theme) => ({
     right: '-5%',
     zIndex: 1,
   },
-  contactList: {
+  contactListContainer: {
     maxHeight: '200px',
     overflowY: 'auto',
+    marginTop: '1rem',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+    padding: '10px',
+    backgroundColor: '#f9f9f9',
+    [breakpoints.up('xs')]: {
+      borderColor: 'green',
+    },
+    [breakpoints.up('sm')]: {
+      borderColor: 'blue',
+    },
+    [breakpoints.up('md')]: {
+      borderColor: 'red',
+    },
+    [breakpoints.up('lg')]: {
+      borderColor: 'yellow',
+    },
+    [breakpoints.up('xl')]: {
+      borderColor: 'orange',
+    },
+  },
+  contactListItem: {
+    marginBottom: '8px',
+    padding: '8px',
+    borderRadius: '4px',
+    backgroundColor: '#ffffff',
+    '&:hover': {
+      backgroundColor: '#f0f0f0',
+    },
+    [breakpoints.up('xs')]: {
+      borderColor: 'green',
+    },
+    [breakpoints.up('sm')]: {
+      borderColor: 'blue',
+    },
+    [breakpoints.up('md')]: {
+      borderColor: 'red',
+    },
+    [breakpoints.up('lg')]: {
+      borderColor: 'yellow',
+    },
+    [breakpoints.up('xl')]: {
+      borderColor: 'orange',
+    },
+  },
+  paginationContainer: {
+    display: 'flex',
+    justifyContent: 'center',
     marginTop: '1rem',
   },
 }));
 
 const CLIENT_ID = '573862915884-k4bvupi40rb0iamkdnne2ue60pk4r0eh.apps.googleusercontent.com';
+
 const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/people/v1/rest"];
 const SCOPES = "https://www.googleapis.com/auth/contacts.readonly";
 
@@ -101,10 +150,12 @@ export default function AnmShare({ userName, productSKU }) {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
-  const [contacts, setContacts] = useState([]);  // State to store contacts
+  const [contacts, setContacts] = useState([]);  // State to store all contacts
   const [filteredContacts, setFilteredContacts] = useState([]);  // State for filtered contacts
   const [searchQuery, setSearchQuery] = useState('');  // State for search query
   const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);  // State for pagination
+  const [contactsPerPage] = useState(10);  // Number of contacts per page
   const { firstName } = useContext(AuthContext);
   const [title, setTitle] = useState('Share Your Book');
 
@@ -119,39 +170,42 @@ export default function AnmShare({ userName, productSKU }) {
     gapi.load('client:auth2', start);
   }, []);
 
-  // Handle Google Sign-In and access contacts
-  const handleGoogleContacts = () => {
-    gapi.auth2.getAuthInstance().signIn().then(() => {
-      gapi.client.people.people.connections.list({
+  const fetchAllContacts = async () => {
+    let allContacts = [];
+    let nextPageToken = '';
+
+    do {
+      const response = await gapi.client.people.people.connections.list({
         resourceName: 'people/me',
         pageSize: 100,
+        pageToken: nextPageToken,
         personFields: 'names,emailAddresses',
-      }).then(response => {
-        const connections = response.result.connections;
-        if (connections) {
-          const contactList = connections.map(person => {
-            const name = person.names ? person.names[0].displayName : "No Name";
-            const email = person.emailAddresses ? person.emailAddresses[0].value : "No Email";
-            return { name, email };
-          });
-          setContacts(contactList);
-          setFilteredContacts(contactList);  // Initially, all contacts are shown
-        } else {
-          console.log("No connections found.");
-        }
-      }).catch(error => {
+      });
+      const connections = response.result.connections || [];
+      allContacts = [...allContacts, ...connections.map(person => ({
+        name: person.names ? person.names[0].displayName : "No Name",
+        email: person.emailAddresses ? person.emailAddresses[0].value : "No Email"
+      }))];
+      nextPageToken = response.result.nextPageToken || '';
+    } while (nextPageToken);
+
+    setContacts(allContacts);
+    setFilteredContacts(allContacts);
+  };
+
+  const handleGoogleContacts = () => {
+    gapi.auth2.getAuthInstance().signIn().then(() => {
+      fetchAllContacts().catch(error => {
         console.error("Error fetching contacts: ", error);
       });
     });
   };
 
-  // Handle contact selection
   const handleSelectContact = (contact) => {
     setName(contact.name);
     setEmail(contact.email);
   };
 
-  // Handle search query input and filter contacts
   const handleSearch = (event) => {
     const query = event.target.value.toLowerCase();
     setSearchQuery(query);
@@ -160,15 +214,23 @@ export default function AnmShare({ userName, productSKU }) {
       contact.name.toLowerCase().includes(query)
     );
     setFilteredContacts(filtered);
+    setCurrentPage(1);  // Reset to first page on new search
   };
 
-  // Placeholder for submitting the form
+  // Pagination logic
+  const indexOfLastContact = currentPage * contactsPerPage;
+  const indexOfFirstContact = indexOfLastContact - contactsPerPage;
+  const currentContacts = filteredContacts.slice(indexOfFirstContact, indexOfLastContact);
+
+  const paginate = (event, value) => {
+    setCurrentPage(value);
+  };
+
   const handleSubmit = () => {
     console.log('Submit the form');
     // Logic to create and send the shareable link goes here
   };
 
-  // Handle component cancel
   const handleCancel = () => {
     setShowComponent(false);
   };
@@ -217,7 +279,7 @@ export default function AnmShare({ userName, productSKU }) {
                 <Button onClick={handleGoogleContacts}>
                   Import from Google Contacts
                 </Button>
-                
+
                 {contacts.length > 0 && (
                   <div>
                     <TextField
@@ -228,13 +290,23 @@ export default function AnmShare({ userName, productSKU }) {
                       onChange={handleSearch}
                       margin="normal"
                     />
-                    <List className={classes.contactList}>
-                      {filteredContacts.map((contact, index) => (
-                        <ListItem key={index} onClick={() => handleSelectContact(contact)}>
-                          <ListItemText primary={contact.name} secondary={contact.email} />
-                        </ListItem>
-                      ))}
-                    </List>
+                    <Paper className={classes.contactListContainer} elevation={3}>
+                      <List className={classes.contactList}>
+                        {currentContacts.map((contact, index) => (
+                          <ListItem key={index} onClick={() => handleSelectContact(contact)} className={classes.contactListItem}>
+                            <ListItemText primary={contact.name} secondary={contact.email} />
+                          </ListItem>
+                        ))}
+                      </List>
+                    </Paper>
+                    <div className={classes.paginationContainer}>
+                      <Pagination
+                        count={Math.ceil(filteredContacts.length / contactsPerPage)}
+                        page={currentPage}
+                        onChange={paginate}
+                        color="primary"
+                      />
+                    </div>
                   </div>
                 )}
 
