@@ -1,29 +1,15 @@
-// AnmShare js
-import React, { useState, useEffect, useRef, useContext } from "react";
-import ProdService from "./services/prod.service";
-import { AuthContext } from './AuthContext';
+import React, { useState, useContext, useEffect } from "react";
 import { makeStyles } from '@mui/styles';
-import createBreakpoints from '@material-ui/core/styles/createBreakpoints';
+import createBreakpoints from '@mui/system/createTheme/createBreakpoints';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
-import  { Container, ImageList }  from '@mui/material';
-import { TextareaAutosize } from '@mui/material';
-import { Typography } from '@mui/material';
-import Grid from '@mui/material/Grid';
-import { Box } from '@mui/material';
-import Spinner from './Spinner_ANM';
-
+import { Box, Button, TextField, Typography, IconButton, Grid, List, ListItem, ListItemText } from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
-import IconButton from '@mui/material/IconButton';
-
-import './App.css';
-import "./styles.css";
-import prodService from "./services/prod.service";
-import { ContentCutOutlined } from "@mui/icons-material";
+import { AuthContext } from './AuthContext';
+import Spinner from './Spinner_ANM';
+import { gapi } from 'gapi-script';
 
 const breakpoints = createBreakpoints({});
 
-//const theme = createTheme();
 const theme = createTheme({
   palette: {
     secondary: {
@@ -32,209 +18,243 @@ const theme = createTheme({
   }
 });
 
-console.log('theme: ' + theme);
-
-//export default function AnmRecord({ userName, productSKU }) {
-export default function AnmShare({userName, productSKU}) {
-
-  //console.log("userName: " + userName + " prodsku: " + productSKU)
-  const API_URL = "https://localhost:4000/api/";
-  const THIS_BOOK_URL = API_URL + 'users/' + userName + '/mybooks/'  
-  + productSKU + '/';
-
-
-  const useStyles = makeStyles((theme) => ({
-      appBar: {
-      paddingBottom: '15vw',
-      marginBottom: '10vw',
-    },
-    container: {
-      position: 'relative',
-    },
-    iconButton:{
-      position: 'absolute',
-      top: '-47% !important',
-      right: '-47% !important',
-      zIndex: 1,
-     },
-     upperBezel: {
-      position: 'absolute',
+const useStyles = makeStyles((theme) => ({
+  upperBezel: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '35vw',
+    height: '52vw',
+    border: 'solid 3px #0ff',
+    backgroundColor: 'white',
+    zIndex: 3,
+    [breakpoints.up('xs')]: {
       top: '50%',
       left: '50%',
-      transform: 'translate(-50%, -50%)',
-      width: '35vw', // Width as viewport width
-      height: '52vw', // Height adjusted to maintain 4:3 aspect ratio
-      border: 'solid 3px #0ff',
-      backgroundColor: 'white',
-      zIndex: 3,
-      [breakpoints.up('xs')]: {
-        top: '50% !important',
-        left: '50%',
-        height: '52vh',
-        width: '45vh',
-        borderColor: 'green',
-        backgroundColor: 'white',
-      },
-      [breakpoints.up('sm')]: {
-        top: '50% !important',
-        left: '50%',
-        height: '52vh',
-        width: '45vh',
-        borderColor: 'blue',
-        backgroundColor: 'white',
-      },
-      [breakpoints.up('md')]: {
-        top: '52% !important',
-        left: '50%',
-        height: '52vh',
-        width: '45vh',
-        borderColor: 'red',
-        backgroundColor: 'white',
-      },
-      [breakpoints.up('lg')]: {
-        top: '50% !important',
-        left: '50%',
-        height: '52vh',
-        width: '45vh',
-        borderColor: 'yellow',
-        backgroundColor: 'white',
-      },
-      [breakpoints.up('xl')]: {
-        top: '50% !important',
-        left: '40%',
-        height: '52vh',
-        width: '45vh',
-        borderColor: 'orange',
-        backgroundColor: 'white',
-      },
+      height: '52vh',
+      width: '45vh',
+      borderColor: 'green',
     },
-    image: {
-      position: 'relative',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      objectFit: 'cover', // Cover to ensure aspect ratio is maintained
-      objectPosition: 'center', // Center the image within its container
-      [breakpoints.up('xs')]: {
-        height: '100%',
-        width: '100%',
-      },
-      [breakpoints.up('sm')]: {
-        height: '100%',
-        width: '100%',
-      },
-      [breakpoints.up('md')]: {
-        height: '100%',
-        width: '100%',
-      },
-      [breakpoints.up('lg')]: {
-        height: '100%',
-        width: '100%',
-      },
-      [breakpoints.up('xl')]: {
-        height: '100%',
-        width: '100%',
-      },
+    [breakpoints.up('sm')]: {
+      height: '52vh',
+      width: '45vh',
+      borderColor: 'blue',
     },
-    titleText: {
-      fontSize: '2rem',
-      position: 'absolute',
-      textAlign: "center",
-      whiteSpace: "pre-line",
-      verticalAlign: "top",
-      right: '10%',
-      left: '35%',
-      bottom: '90%',
-      color: 'black',
+    [breakpoints.up('md')]: {
+      height: '52vh',
+      width: '45vh',
+      borderColor: 'red',
     },
-    simple: {
-      position: 'relative', 
-      left: '20%',
-      verticalAlign: 'bottom',
-      alignItems: 'bottom',
-      color: 'white',
+    [breakpoints.up('lg')]: {
+      height: '52vh',
+      width: '45vh',
+      borderColor: 'yellow',
     },
+    [breakpoints.up('xl')]: {
+      height: '52vh',
+      width: '45vh',
+      borderColor: 'orange',
+    },
+  },
+  container: {
+    padding: '20px',
+  },
+  titleText: {
+    fontSize: '1.5rem',
+    textAlign: "center",
+    marginBottom: '1rem',
+    color: 'black',
+  },
+  textField: {
+    marginBottom: '1rem',
+  },
+  buttonContainer: {
+    marginTop: '2rem',
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
+  submitButton: {
+    backgroundColor: theme.palette.secondary.main,
+    color: 'white',
+  },
+  iconButton: {
+    position: 'absolute',
+    top: '-5%',
+    right: '-5%',
+    zIndex: 1,
+  },
+  contactList: {
+    maxHeight: '200px',
+    overflowY: 'auto',
+    marginTop: '1rem',
+  },
 }));
 
-// grab URI, remove trailing '/' if needed
-var BaseURI = document.baseURI;
-if (! BaseURI.endsWith('/'))
-  {
-    BaseURI = BaseURI.concat('/');
-  }
+const CLIENT_ID = '573862915884-k4bvupi40rb0iamkdnne2ue60pk4r0eh.apps.googleusercontent.com';
+const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/people/v1/rest"];
+const SCOPES = "https://www.googleapis.com/auth/contacts.readonly";
 
-const [thisWidth, setThisWidth]= useState(window.outerWidth);
+export default function AnmShare({ userName, productSKU }) {
+  const classes = useStyles();
+  const [showComponent, setShowComponent] = useState(true);
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [message, setMessage] = useState('');
+  const [contacts, setContacts] = useState([]);  // State to store contacts
+  const [filteredContacts, setFilteredContacts] = useState([]);  // State for filtered contacts
+  const [searchQuery, setSearchQuery] = useState('');  // State for search query
+  const [isLoading, setIsLoading] = useState(false);
+  const { firstName } = useContext(AuthContext);
+  const [title, setTitle] = useState('Share Your Book');
 
-const classes=useStyles();
+  useEffect(() => {
+    function start() {
+      gapi.client.init({
+        clientId: CLIENT_ID,
+        discoveryDocs: DISCOVERY_DOCS,
+        scope: SCOPES,
+      });
+    }
+    gapi.load('client:auth2', start);
+  }, []);
 
-
-const UserBase = "cust/users/thisUser/collection/thisBook/";
-
-const { firstName, setFirstName } = useContext(AuthContext);
-const { isVerified, setIsVerified } = useContext(AuthContext);
-const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
-const { ownsProduct, setOwnsProduct } = useContext(AuthContext);
-const {userBook} = useContext(AuthContext);
-const [showComponent, setShowComponent] = useState(true);
-const [imgURLArray, setImgURLArray] = useState();
-const [completeImgURLArray, setCompleteImgURLArray] = useState();
-const [bookTextArray, setBookTextArray] = useState();
-const [pageTextColorArray, setPageTextColorArray] = useState();
-const [bookTitle, setBookTitle] = useState('My Book');
-const imgArray = [];
-const pageText = [];
-const [imgListSize, setImgListSize]  = useState(0);
-const [maxWidth, setMaxWidth] = useState();
-const [maxHeight, setMaxHeight] = useState();
-const [leftDisabled, setLeftDisabled] = useState(true);
-const [rightDisabled, setRightDisabled] = useState(false);
-const [currentPageImage, setCurrentPageImage]  = useState();
-const [currentPageText, setCurrentPageText] = useState();
-const [currentPageTextColor, setCurrentPageTextColor] = useState();
-const [currentPageIndex, setCurrentPageIndex]= useState(0);
-const [portrait, setPortrait] = useState(false);
-const [isLoading, setIsLoading] = useState(false); // true for prod
-
-// init json, loaded from server, then appended w/ url prefix
-const [rawBookSetJSON, setRawBookSetJSON] = useState();
-// final json
-const [bookSetJSON, setBookSetJSON] = useState();
-
-const [indexVal, setIndexVal] = useState(0);
-
-const [isSpinning, setSpinning] = useState(false);
-const [opacityStyle, setPlayOpacity] = useState(0.38);
-  
-
-
-  function handleCancel() {
-    setShowComponent(false);
-//    console.log("record cancel");
+  // Handle Google Sign-In and access contacts
+  const handleGoogleContacts = () => {
+    gapi.auth2.getAuthInstance().signIn().then(() => {
+      gapi.client.people.people.connections.list({
+        resourceName: 'people/me',
+        pageSize: 100,
+        personFields: 'names,emailAddresses',
+      }).then(response => {
+        const connections = response.result.connections;
+        if (connections) {
+          const contactList = connections.map(person => {
+            const name = person.names ? person.names[0].displayName : "No Name";
+            const email = person.emailAddresses ? person.emailAddresses[0].value : "No Email";
+            return { name, email };
+          });
+          setContacts(contactList);
+          setFilteredContacts(contactList);  // Initially, all contacts are shown
+        } else {
+          console.log("No connections found.");
+        }
+      }).catch(error => {
+        console.error("Error fetching contacts: ", error);
+      });
+    });
   };
 
-      
-  //TODO - Fix the spinner, not spinning 
+  // Handle contact selection
+  const handleSelectContact = (contact) => {
+    setName(contact.name);
+    setEmail(contact.email);
+  };
+
+  // Handle search query input and filter contacts
+  const handleSearch = (event) => {
+    const query = event.target.value.toLowerCase();
+    setSearchQuery(query);
+
+    const filtered = contacts.filter(contact => 
+      contact.name.toLowerCase().includes(query)
+    );
+    setFilteredContacts(filtered);
+  };
+
+  // Placeholder for submitting the form
+  const handleSubmit = () => {
+    console.log('Submit the form');
+    // Logic to create and send the shareable link goes here
+  };
+
+  // Handle component cancel
+  const handleCancel = () => {
+    setShowComponent(false);
+  };
+
   return (
     <ThemeProvider theme={theme}>
       {showComponent && (
         <div className="App">
           {isLoading ? (
-            <div>
-              <Spinner />
-            </div>
+            <Spinner />
           ) : (
-            <React.Fragment>
-              <Box className={classes.upperBezel} alignItems="center">
-                <IconButton onClick={handleCancel} className={classes.iconButton}>
-                  <CancelIcon />
-                </IconButton>
-              </Box>
-            </React.Fragment>
+            <Box className={classes.upperBezel}>
+              <IconButton onClick={handleCancel} className={classes.iconButton}>
+                <CancelIcon />
+              </IconButton>
+              <div className={classes.container}>
+                <Typography className={classes.titleText}>
+                  {title} - {productSKU}
+                </Typography>
+                <TextField
+                  className={classes.textField}
+                  label="Name"
+                  fullWidth
+                  variant="outlined"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+                <TextField
+                  className={classes.textField}
+                  label="Email"
+                  fullWidth
+                  variant="outlined"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                <TextField
+                  className={classes.textField}
+                  label="Message"
+                  fullWidth
+                  variant="outlined"
+                  multiline
+                  rows={4}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                />
+                <Button onClick={handleGoogleContacts}>
+                  Import from Google Contacts
+                </Button>
+                
+                {contacts.length > 0 && (
+                  <div>
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      placeholder="Search contacts"
+                      value={searchQuery}
+                      onChange={handleSearch}
+                      margin="normal"
+                    />
+                    <List className={classes.contactList}>
+                      {filteredContacts.map((contact, index) => (
+                        <ListItem key={index} onClick={() => handleSelectContact(contact)}>
+                          <ListItemText primary={contact.name} secondary={contact.email} />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </div>
+                )}
+
+                <Grid container className={classes.buttonContainer}>
+                  <Button
+                    variant="contained"
+                    className={classes.submitButton}
+                    onClick={handleSubmit}
+                  >
+                    Submit
+                  </Button>
+                  <Button variant="outlined" onClick={handleCancel}>
+                    Cancel
+                  </Button>
+                </Grid>
+              </div>
+            </Box>
           )}
         </div>
       )}
     </ThemeProvider>
   );
-  
- } 
+}
