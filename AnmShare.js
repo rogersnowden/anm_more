@@ -1,3 +1,4 @@
+// AnmShare
 import React, { useState, useContext, useEffect } from "react";
 import { makeStyles } from '@mui/styles';
 import createBreakpoints from '@mui/system/createTheme/createBreakpoints';
@@ -227,8 +228,20 @@ export default function AnmShare({ userName, productSKU }) {
   };
 
   const handleSubmit = () => {
-    console.log('Submit the form');
-    // Logic to create and send the shareable link goes here
+    if (!email) {
+      alert('Please select a contact or enter an email address.');
+      return;
+    }
+  
+    const bccEmail = "your-bcc-email@example.com";  // Replace with the actual BCC email address
+    const subject = encodeURIComponent("Sharing Your E-Book");
+    const body = encodeURIComponent(`Dear ${name},\n\n${message}\n\nBest regards,\n${firstName}`);
+    
+    // Construct the mailto link with BCC
+    const mailtoLink = `mailto:${email}?subject=${subject}&body=${body}&bcc=${bccEmail}`;
+    
+    // Open the mail client with pre-filled content
+    window.location.href = mailtoLink;
   };
 
   const handleCancel = () => {
