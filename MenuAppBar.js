@@ -18,7 +18,6 @@ import Menu from '@mui/material/Menu';
 import AnmLevel from './AnmLevel';  // Import the AnmLevel component
 import AnmHome from './AnmHome';
 import AnmRecord from './AnmRecord';
-// Other imports...
 
 export default function MenuAppBar (props)  {
 
@@ -49,8 +48,9 @@ export default function MenuAppBar (props)  {
     handleCloseMain();
   };
 
+  // Modify the anmLevel function to pass a close function to AnmLevel
   const anmLevel = () => {
-    setWhichPage(<AnmLevel key={Date.now()} />);
+    setWhichPage(<AnmLevel key={Date.now()} onClose={() => setWhichPage(null)} />); // Pass onClose to AnmLevel
     handleCloseMain();
   };
 
@@ -100,7 +100,6 @@ export default function MenuAppBar (props)  {
               <MenuItem onClick={anmHome}>Home</MenuItem>
               <MenuItem onClick={anmRecord}>Record</MenuItem>
               <MenuItem onClick={anmLevel}>Adjust Mic Levels</MenuItem> {/* New Menu Item */}
-              {/* Other Menu Items... */}
             </Menu>
           </Toolbar>
         </AppBar>
