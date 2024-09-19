@@ -1,26 +1,17 @@
-// AnmLevel set mic level and save to Context obj
-import React, { useState, useRef, useContext, useEffect } from 'react';
-import { Box, Slider, Typography, Button } from '@mui/material';
-import { AuthContext } from './AuthContext';
+import React, { useState, useRef, useEffect } from 'react';
+import { Box, Typography, Button } from '@mui/material';
 
 export default function AnmLevel({ onClose }) {
-  const { micLevel, setMicLevel } = useContext(AuthContext); // Use micLevel from context
-  const [isRecording, setIsRecording] = useState(false);
-  const [audioBlob, setAudioBlob] = useState(null); // Store the recorded audio blob
   const [audioLevel, setAudioLevel] = useState(0); // Decibel meter level
-  const [isPlaying, setIsPlaying] = useState(false); // State to track if audio is playing
   const audioContextRef = useRef(null);
   const analyserRef = useRef(null);
-  const gainNodeRef = useRef(null);
   const dataArrayRef = useRef(null);
-  const mediaRecorderRef = useRef(null); // For recording
   const micStreamRef = useRef(null); // Store the microphone stream for the test
-  const audioRef = useRef(null); // For playback
-  const recordedChunks = useRef([]); // Store the audio chunks
-  const outputStreamRef = useRef(null); // To store the processed audio stream
   const frameHistory = useRef([]); // Keep track of the last few frames
-  const historySize = 20; // Adjust the size of the moving average window
+  const historySize = 10; // Adjust the size of the moving average window
   const frameRequestRef = useRef(null); // To store requestAnimationFrame for cleanup
+
+  var maxlevel = 0;
 
   // Predefine the colors for each box using a static gradient (green -> yellow -> red)
   const segmentColors = [
@@ -43,9 +34,9 @@ export default function AnmLevel({ onClose }) {
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
       audioContextRef.current = audioContext;
 
-      // Create media source, analyser, and gain nodes
+      // Create media source and analyser node
       const analyser = audioContext.createAnalyser();
-      analyser.fftSize = 2048;
+      analyser.fftSize = 256;
       analyserRef.current = analyser;
 
       const source = audioContext.createMediaStreamSource(stream);
@@ -61,35 +52,39 @@ export default function AnmLevel({ onClose }) {
     }
   };
 
-  // Adjust decibel calculation to increase scaling sensitivity and mapping
+  const noiseThreshold = 125; // Set the threshold value (adjust for testing)
+
+  // Adjust decibel calculation to increase scaling sensitivity and apply noise threshold
   const updateAudioLevel = () => {
     if (analyserRef.current && dataArrayRef.current) {
       analyserRef.current.getByteFrequencyData(dataArrayRef.current);
-
+  
       // Find the maximum decibel level for the current frame
       const currentMaxLevel = Math.max(...dataArrayRef.current);
-
+  
+      // Apply the noise threshold: ignore sounds below the threshold
+      const processedLevel = currentMaxLevel >= noiseThreshold ? currentMaxLevel : 0;
+  
       // Add the current max level to the frame history
-      frameHistory.current.push(currentMaxLevel);
-
+      frameHistory.current.push(processedLevel);
+  
       // Limit the history size to the last 'historySize' frames
       if (frameHistory.current.length > historySize) {
         frameHistory.current.shift(); // Remove the oldest frame
       }
-
+  
       // Calculate the average over the stored frames (moving average)
       const movingAverageLevel = frameHistory.current.reduce((sum, value) => sum + value, 0) / frameHistory.current.length;
-
-      // Scale the moving average to a 0-100 range
-      const scaledLevel = Math.min(100, (movingAverageLevel / 255) * 100);
-
+  
+      // Scale the moving average to a 0-100 range, using log scaling for better sensitivity
+      const scaledLevel = Math.min(100, (Math.log(movingAverageLevel + 1) / Math.log(256)) * 100);
       setAudioLevel(scaledLevel);
     }
-
+  
     // Keep updating the meter
     frameRequestRef.current = requestAnimationFrame(updateAudioLevel);
   };
-
+    
   // Automatically start the mic test when the component is loaded
   useEffect(() => {
     const activateAudioContext = async () => {
@@ -112,85 +107,7 @@ export default function AnmLevel({ onClose }) {
     };
   }, []);
 
-  // Handle slider change for mic volume (only affects fine-tuning section)
-  const handleVolumeChange = (event, newValue) => {
-    setMicLevel(newValue);
-    if (gainNodeRef.current) {
-      gainNodeRef.current.gain.value = newValue / 100 * 5; // Adjust gain value in fine-tuning section
-    }
-  };
-
-  // Function to start recording
-  const startRecording = async () => {
-    recordedChunks.current = []; // Clear previous chunks
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      audioContextRef.current = audioContext;
-
-      const analyser = audioContext.createAnalyser();
-      analyser.fftSize = 2048;
-      analyserRef.current = analyser;
-
-      const source = audioContext.createMediaStreamSource(stream);
-      const gainNode = audioContext.createGain();
-      gainNode.gain.value = micLevel / 100 * 5; // Set gain based on app-level slider
-
-      gainNodeRef.current = gainNode;
-      source.connect(gainNode);
-      gainNode.connect(analyser);
-
-      const destination = audioContext.createMediaStreamDestination();
-      gainNode.connect(destination);
-      outputStreamRef.current = destination.stream;
-
-      mediaRecorderRef.current = new MediaRecorder(outputStreamRef.current);
-      mediaRecorderRef.current.ondataavailable = (event) => {
-        recordedChunks.current.push(event.data);
-      };
-
-      mediaRecorderRef.current.onstop = () => {
-        const blob = new Blob(recordedChunks.current, { type: 'audio/webm' });
-        setAudioBlob(blob);
-        recordedChunks.current = []; // Clear chunks after recording
-      };
-
-      mediaRecorderRef.current.start();
-      setIsRecording(true);
-      updateAudioLevel(); // Start updating decibel meter during recording
-    } catch (error) {
-      console.error('Error starting recording:', error);
-    }
-  };
-
-  // Function to stop recording
-  const stopRecording = () => {
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
-    }
-    setIsRecording(false);
-  };
-
-  // Play back the recorded audio
-  const playRecording = () => {
-    if (audioBlob && audioRef.current) {
-      const audioURL = URL.createObjectURL(audioBlob);
-      audioRef.current.src = audioURL;
-      audioRef.current.play();
-
-      // Disable the button during playback
-      setIsPlaying(true);
-
-      // Add event listeners to re-enable the button after playback
-      audioRef.current.onended = () => setIsPlaying(false);
-      audioRef.current.onpause = () => setIsPlaying(false);
-    }
-  };
-
-  // Handle the "Done" button to finalize the mic level and save it to context
   const handleDone = () => {
-    console.log('Microphone level set to:', micLevel);
-    setMicLevel(micLevel); // Save mic level to context
     onClose(); // Call the onClose prop to close the component
   };
 
@@ -229,11 +146,11 @@ export default function AnmLevel({ onClose }) {
 
       {/* Instructions Section */}
       <Box 
-      sx={{ textAlign: 'left', padding: '10px', marginBottom: '10px', borderRadius: '8px' }}
+        sx={{ textAlign: 'left', padding: '10px', marginBottom: '10px', borderRadius: '8px' }}
       >
         <Typography style={{ fontSize: '20px', color: 'black', marginBottom: '10px' }}>
-          <p>Adjust Microphone Level</p>
-          <p>Speak into your microphone, reading the line in the box below. Adjust your device volume level to the middle of the range. If the red boxes light, reduce the microphone volume until the highest values are orange.</p>
+          <p>Speak into your microphone, reading the line in the box below.</p>
+          <p>If the red boxes light, reduce the microphone volume until the highest values are orange.</p>
         </Typography>
       </Box>
 
@@ -259,23 +176,6 @@ export default function AnmLevel({ onClose }) {
         </Typography>
       </Box>
 
-      {/* Instructions for Testing */}
-      <Box
-        sx={{
-          textAlign: 'left',
-          padding: '10px',
-          marginBottom: '10px',
-          borderRadius: '8px',
-        }}
-      >
-        <Typography
-          sx={{ fontSize: '20px', color: 'black', marginBottom: '10px' }}
-        >
-          <p>Test Recording</p>
-          <p>Click the "Start Recording" button and speak the line into your microphone again. Then click "Stop Recording" and "Playback Audio" to review the sound level. Use the Adjust Volume slider to fine tune.</p>
-        </Typography>
-      </Box>
-
       {/* Decibel Meter for Mic Test */}
       <Box
         sx={{
@@ -287,47 +187,7 @@ export default function AnmLevel({ onClose }) {
       >
         {getMeterSegments(audioLevel)}
       </Box>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginTop: '20px',
-          marginBottom: '20px'
-        }}
-      >
-      </Box>
 
-      {/* Record/Stop Buttons */}
-      <Box>
-        {isRecording ? (
-          <Button variant="contained" color="secondary" onClick={stopRecording}>
-            Stop Recording
-          </Button>
-        ) : (
-          <Button variant="contained" color="primary" onClick={startRecording}>
-            Start Recording
-          </Button>
-        )}
-      </Box>
-
-      {/* Volume Slider */}
-      <Box style={{ marginTop: '20px' }}>
-        <Typography variant="body1">Adjust Volume:</Typography>
-        <Slider
-          value={micLevel} // Use micLevel from context
-          min={0}
-          max={100}
-          onChange={handleVolumeChange}
-          aria-labelledby="volume-slider"
-          sx={{ width: '300px' }} // Adjust slider width
-        />
-        <Typography variant="body2" style={{ marginTop: '10px' }}>
-          Current Volume: {micLevel}
-        </Typography>
-      </Box>
-
-      {/* Playback and Done Buttons */}
       <Box
         sx={{
           display: 'flex',
@@ -336,15 +196,6 @@ export default function AnmLevel({ onClose }) {
           marginTop: '20px',
         }}
       >
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={playRecording}
-          disabled={!audioBlob || isPlaying} // Disable the button if no audio has been recorded or during playback
-          sx={{ marginRight: '10px' }}
-        >
-          Playback Audio
-        </Button>
         <Button
           variant="contained"
           color="success"
@@ -353,8 +204,6 @@ export default function AnmLevel({ onClose }) {
           Done
         </Button>
       </Box>
-
-      <audio ref={audioRef} controls style={{ display: 'none' }} />
     </Box>
   );
 }

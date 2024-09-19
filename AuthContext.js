@@ -9,7 +9,6 @@ const AuthProvider = ({ children }) => {
   const [userName, setUserName] = useState(null);
   const [firstName, setFirstName] = useState(null);
   const [isVerified, setIsVerified] = useState(false);
-  const [micLevel, setMicLevel] = useState(50); // def mic level
   const [ownsProduct, setOwnsProduct] = useState(false);
   const [libraryItems, setLibraryItems] = useState();
   const [wasCancelled, setWasCancelled] = useState(false);
@@ -29,7 +28,6 @@ const AuthProvider = ({ children }) => {
       userName, setUserName,
       firstName, setFirstName,
       isVerified, setIsVerified,
-      micLevel, setMicLevel,
       ownsProduct, setOwnsProduct,
       libraryItems, setLibraryItems,
       wasCancelled, setWasCancelled,

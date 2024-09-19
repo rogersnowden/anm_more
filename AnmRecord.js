@@ -245,6 +245,7 @@ const UserBase = "cust/users/thisUser/collection/thisBook/";
 const { firstName, setFirstName } = useContext(AuthContext);
 const { isVerified, setIsVerified } = useContext(AuthContext);
 const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
+const { micLevel } = useContext(AuthContext);
 const { ownsProduct, setOwnsProduct } = useContext(AuthContext);
 const {userBook} = useContext(AuthContext);
 const [showComponent, setShowComponent] = useState(true);
