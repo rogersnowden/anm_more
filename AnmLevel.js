@@ -1,7 +1,41 @@
+// AnmLevel.js set mic level, popup
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, Dialog, DialogContent, DialogActions } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 
-export default function AnmLevel({ onClose }) {
+const useStyles = makeStyles((theme) => ({
+  root: {
+    backgroundColor: 'transparent',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100vh',
+//    zIndex: 9997,
+    position: 'relative',
+  },
+  form: {
+    width: '300px',
+    padding: theme.spacing(2),
+    borderRadius: theme.spacing(1),
+    backgroundColor: '#ADD1F5',
+    zIndex: '9997 !important',
+    position: 'relative !important',
+  },
+  input: {
+    backgroundColor: 'white',
+    marginBottom: theme.spacing(2),
+  },
+  buttonContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginTop: theme.spacing(2),
+  },
+  button: {
+    width: '48%',
+  },
+}));
+
+export default function AnmLevel({ open, onClose }) {
   const [audioLevel, setAudioLevel] = useState(0); // Decibel meter level
   const audioContextRef = useRef(null);
   const analyserRef = useRef(null);
@@ -11,7 +45,7 @@ export default function AnmLevel({ onClose }) {
   const historySize = 10; // Adjust the size of the moving average window
   const frameRequestRef = useRef(null); // To store requestAnimationFrame for cleanup
 
-  var maxlevel = 0;
+  const noiseThreshold = 125; // Set the threshold value (adjust for testing)
 
   // Predefine the colors for each box using a static gradient (green -> yellow -> red)
   const segmentColors = [
@@ -52,35 +86,33 @@ export default function AnmLevel({ onClose }) {
     }
   };
 
-  const noiseThreshold = 125; // Set the threshold value (adjust for testing)
-
   // Adjust decibel calculation to increase scaling sensitivity and apply noise threshold
   const updateAudioLevel = () => {
     if (analyserRef.current && dataArrayRef.current) {
       analyserRef.current.getByteFrequencyData(dataArrayRef.current);
-  
+
       // Find the maximum decibel level for the current frame
       const currentMaxLevel = Math.max(...dataArrayRef.current);
-  
+
       // Apply the noise threshold: ignore sounds below the threshold
       const processedLevel = currentMaxLevel >= noiseThreshold ? currentMaxLevel : 0;
-  
+
       // Add the current max level to the frame history
       frameHistory.current.push(processedLevel);
-  
+
       // Limit the history size to the last 'historySize' frames
       if (frameHistory.current.length > historySize) {
         frameHistory.current.shift(); // Remove the oldest frame
       }
-  
+
       // Calculate the average over the stored frames (moving average)
       const movingAverageLevel = frameHistory.current.reduce((sum, value) => sum + value, 0) / frameHistory.current.length;
-  
+
       // Scale the moving average to a 0-100 range, using log scaling for better sensitivity
       const scaledLevel = Math.min(100, (Math.log(movingAverageLevel + 1) / Math.log(256)) * 100);
       setAudioLevel(scaledLevel);
     }
-  
+
     // Keep updating the meter
     frameRequestRef.current = requestAnimationFrame(updateAudioLevel);
   };
@@ -136,41 +168,53 @@ export default function AnmLevel({ onClose }) {
   };
 
   return (
-    <Box>
+  <Dialog 
+    open={open} 
+    onClose={onClose} 
+    maxWidth="sm" 
+    fullWidth
+    sx={{ '& .MuiDialog-paper': { borderRadius: '10px' } }} // Add borderRadius here
+    BackdropProps={{
+      style: { backgroundColor: 'transparent' }, // This will make the backdrop transparent
+    }}
+  >
+    <DialogContent sx={{  
+        borderRadius: '10px', 
+        borderColor: '#ADD1F5',
+        padding: '20px',
+        backgroundColor: '#ADD1F5'
+        }}>
       <Typography
         variant="h4"
-        sx={{ marginLeft: '30px', marginRight: '30px', marginTop: '30px', marginBottom: '30px' }}
+        sx={{ marginBottom: '20px' }}
       >
         Set Microphone Level
       </Typography>
 
       {/* Instructions Section */}
-      <Box 
-        sx={{ textAlign: 'left', padding: '10px', marginBottom: '10px', borderRadius: '8px' }}
-      >
-        <Typography style={{ fontSize: '20px', color: 'black', marginBottom: '10px' }}>
-          <p>Speak into your microphone, reading the line in the box below.</p>
-          <p>If the red boxes light, reduce the microphone volume until the highest values are orange.</p>
-        </Typography>
-      </Box>
+      <Typography style={{ fontSize: '18px', marginBottom: '20px' }}>
+        Speak into your microphone and read the text below.
+        If the red boxes light up, reduce the microphone volume until the highest values are orange.
+      </Typography>
 
       {/* Mic Test Text */}
       <Box
         sx={{
-          border: '2px solid black',
+  //        border: '2px solid black',
           padding: '10px',
-          marginBottom: '10px',
+          marginBottom: '20px',
           display: 'flex',
-          justifyContent: 'center', // Center the content horizontally
-          alignItems: 'center', // Center vertically
-          borderRadius: '8px', // Rounded corners for better aesthetics
-          width: 'fit-content', // Adjust box size to fit the text content
-          margin: '0 auto', // Center the box horizontally on the page
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderRadius: '8px',
+          width: 'fit-content',
+          margin: '0 auto',
+          backgroundColor: '#ADD1F5',
         }}
       >
         <Typography
           variant="h6"
-          sx={{ color: 'black', fontStyle: 'italic', fontWeight: 'bold', textAlign: 'center' }} // Center the text
+          sx={{ color: 'black', fontStyle: 'italic', fontWeight: 'bold', textAlign: 'center' }}
         >
           "The quick brown fox jumps over the lazy dog."
         </Typography>
@@ -183,27 +227,27 @@ export default function AnmLevel({ onClose }) {
           justifyContent: 'center',
           alignItems: 'center',
           marginTop: '10px',
+          backgroundColor: '#ADD1F5',
         }}
       >
         {getMeterSegments(audioLevel)}
       </Box>
 
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginTop: '20px',
-        }}
-      >
-        <Button
-          variant="contained"
-          color="success"
-          onClick={handleDone}
-        >
-          Done
-        </Button>
-      </Box>
-    </Box>
+    <DialogActions
+          sx={{
+            backgroundColor: '#ADD1F5',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: '10px',
+          }}
+    >
+      <Button variant="contained" color="primary" onClick={handleDone}>
+        Done
+      </Button>
+    </DialogActions>
+    </DialogContent>
+
+  </Dialog>
   );
 }
