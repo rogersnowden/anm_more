@@ -1,7 +1,8 @@
 // auth.service.js 
 import axios from "axios";
 
-const API_URL = "https://localhost:4000/api/";
+//const API_URL = "https://192.168.0.135:4000/api/";
+const API_URL = "https://alwaysnearme.com/api/";
 
 const axiosInstance = axios.create({
   withCredentials: true,
@@ -26,7 +27,7 @@ class AuthService {
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'https://localhost:3000'
+        'Access-Control-Allow-Origin': 'https://alwaysnearme.com'
       }
     };
     axios(requestOptions)
@@ -44,7 +45,8 @@ class AuthService {
   
     logout(username, callback) {
       // expire the cookie
-      document.cookie = `${'accessToken'}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;      axios
+      document.cookie = `${'accessToken'}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        axios
         .post(API_URL + "logout", {
           username,
         })
@@ -59,6 +61,24 @@ class AuthService {
         });
     }
   
+  // NEW METHOD: Verify the reset code
+  verifyResetCode(username, code, callback) {
+    console.log('url: ' + API_URL + "verifyResetCode");
+    const requestOptions = {
+      method: 'POST',
+      url: API_URL + 'verifyResetCode',
+      data: { username, code },
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': 'https://alwaysnearme.com',
+      },
+    };
+    axios(requestOptions)
+      .then((response) => callback(null, response.data))
+      .catch((error) => callback(error, null));
+  }
+
     pwdreset(username, callback) {
       console.log('url: ' + API_URL + "pwdreset");
       const requestOptions = {
@@ -70,7 +90,7 @@ class AuthService {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': 'https://localhost:3000'
+          'Access-Control-Allow-Origin': 'https://alwaysnearme.com'
         }
         };
       axios(requestOptions)
@@ -100,7 +120,7 @@ class AuthService {
           withCredentials: true,
           headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': 'https://localhost:3000'
+            'Access-Control-Allow-Origin': 'https://alwaysnearme.com'
           }
           };
         axios(requestOptions)

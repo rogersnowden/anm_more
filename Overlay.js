@@ -6,16 +6,16 @@ const useStyles = makeStyles((theme) => ({
     position: 'fixed',
     top: 0,
     left: 0,
-    width: '100%',
-    height: '100%',
+    width: '100vw',
+    height: '100vh',
     backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent black
     zIndex: 9998, // Ensure it's on top of other content
-    display: (props) => (props.show ? 'block' : 'none'),
   },
 }));
 
 const Overlay = ({ show }) => {
-  const classes = useStyles({show});
+  const classes = useStyles();
+  if (!show) return null;
   return <div className={classes.overlay}></div>;
 };
 

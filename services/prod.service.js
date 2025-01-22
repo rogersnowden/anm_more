@@ -1,7 +1,9 @@
 // prod.service
 
 import axios from "axios";
-const API_URL = "https://localhost:4000/api/";
+
+//const API_URL = "https://192.168.0.135:4000/api/";
+const API_URL = "https://alwaysnearme.com/api/";
 
 const axiosInstance = axios.create({
   withCredentials: true,

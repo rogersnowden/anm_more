@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/reg/";
+//const API_URL = "http://192.168.0.135:8080/api/reg/";
+const API_URL = "http://alwaysnearme.com/api/reg/";
 
 class RegService {
   login(username, password, email) {
