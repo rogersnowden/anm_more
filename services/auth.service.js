@@ -1,77 +1,71 @@
-// auth.service.js 
 import axios from "axios";
 
-//const API_URL = "https://192.168.0.135:4000/api/";
 const API_URL = "https://alwaysnearme.com/api/";
 
 const axiosInstance = axios.create({
   withCredentials: true,
-  baseURL: API_URL
-})
+  baseURL: API_URL,
+});
 
 var cookie = document.cookie;
 console.log("cookie: " + cookie);
 
-
 class AuthService {
-
   login(username, password, callback) {
-    console.log('url: ' + API_URL + "login");
+    console.log("url: " + API_URL + "login");
     const requestOptions = {
-      method: 'POST',
-      url: API_URL + 'login',
+      method: "POST",
+      url: API_URL + "login",
       data: {
         username: username,
-        password: password
+        password: password,
       },
       withCredentials: true,
       headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'https://alwaysnearme.com'
-      }
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "https://alwaysnearme.com",
+      },
     };
     axios(requestOptions)
-      .then(response => {
+      .then((response) => {
         if (response.data) {
-          var thisCookie = 'accessToken=' + response.data.accessToken;
+          var thisCookie = "accessToken=" + response.data.accessToken;
           document.cookie = thisCookie;
         }
         callback(null, response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         callback(error, null);
       });
-    }
-  
-    logout(username, callback) {
-      // expire the cookie
-      document.cookie = `${'accessToken'}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-        axios
-        .post(API_URL + "logout", {
-          username,
-        })
-        .then(response => {
-          if (response.data) {
-            console.log("logout resp: " + response);
-          }
-          callback(null, response.data);
-        })
-        .catch(error => {
-          callback(error, null);
-        });
-    }
-  
-  // NEW METHOD: Verify the reset code
+  }
+
+  logout(username, callback) {
+    document.cookie = `${"accessToken"}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    axios
+      .post(API_URL + "logout", {
+        username,
+      })
+      .then((response) => {
+        if (response.data) {
+          console.log("logout resp: " + response);
+        }
+        callback(null, response.data);
+      })
+      .catch((error) => {
+        callback(error, null);
+      });
+  }
+
   verifyResetCode(username, code, callback) {
-    console.log('url: ' + API_URL + "verifyResetCode");
+    console.log("url: " + API_URL + "verifyResetCode");
     const requestOptions = {
-      method: 'POST',
-      url: API_URL + 'verifyResetCode',
+      method: "POST",
+      url: API_URL + "verifyResetCode",
       data: { username, code },
       withCredentials: true,
       headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'https://alwaysnearme.com',
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "https://alwaysnearme.com",
       },
     };
     axios(requestOptions)
@@ -79,120 +73,116 @@ class AuthService {
       .catch((error) => callback(error, null));
   }
 
-    pwdreset(username, callback) {
-      console.log('url: ' + API_URL + "pwdreset");
-      const requestOptions = {
-        method: 'POST',
-        url: API_URL + 'pwdreset',
-        data: {
-          username: username,
-        },
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': 'https://alwaysnearme.com'
+  pwdreset(username, callback) {
+    console.log("url: " + API_URL + "pwdreset");
+    const requestOptions = {
+      method: "POST",
+      url: API_URL + "pwdreset",
+      data: {
+        username: username,
+      },
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "https://alwaysnearme.com",
+      },
+    };
+    axios(requestOptions)
+      .then((response) => {
+        if (response.data) {
+          var thisCookie = "accessToken=" + response.data.accessToken;
+          document.cookie = thisCookie;
         }
-        };
-      axios(requestOptions)
-        .then(response => {
-          if (response.data) {
-            var thisCookie = 'accessToken=' + response.data.accessToken;
-            document.cookie = thisCookie;
-          }
-          callback(null, response.data);
-        })
-        .catch(error => {
-          callback(error, null);
-        });
-      }
+        callback(null, response.data);
+      })
+      .catch((error) => {
+        callback(error, null);
+      });
+  }
 
-      // set new password
-      pwdset(token, username, password, callback) {
-        console.log('url: ' + API_URL + "pwdset");
-        const requestOptions = {
-          method: 'POST',
-          url: API_URL + 'pwdset',
-          data: {
-            token: token,
-            username: username,
-            password: password,
-          },
-          withCredentials: true,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': 'https://alwaysnearme.com'
-          }
-          };
-        axios(requestOptions)
-          .then(response => {
-            if (response.data) {
-              var thisCookie = 'accessToken=' + response.data.accessToken;
-              document.cookie = thisCookie;
-            }
-            callback(null, response.data);
-          })
-          .catch(error => {
-            callback(error, null);
-          });
+  pwdset(token, username, password, callback) {
+    console.log("url: " + API_URL + "pwdset");
+    const requestOptions = {
+      method: "POST",
+      url: API_URL + "pwdset",
+      data: {
+        token: token,
+        username: username,
+        password: password,
+      },
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "https://alwaysnearme.com",
+      },
+    };
+    axios(requestOptions)
+      .then((response) => {
+        if (response.data) {
+          var thisCookie = "accessToken=" + response.data.accessToken;
+          document.cookie = thisCookie;
         }
-      
-    register(username, password, firstname, lastname, phonenumber) {
-      return axiosInstance
-      .post(API_URL + "register", {
-          username,
-          password,
-          firstname,
-          lastname,
-          phonenumber,
-        })
-        .then((response) => {
-          // The user was registered successfully
-          return response.data;
-        })
-        .catch((error) => {
-          // Check if the error status is 409 Conflict (user already exists)
-          if (error.response && error.response.status === 409) {
-            throw new Error("User already exists"); // Throw the error to be caught in the component
-          } else {
-            throw new Error("Registration failed"); // Or handle other error cases if needed
-          }
-        });
-    }
-  
+        callback(null, response.data);
+      })
+      .catch((error) => {
+        callback(error, null);
+      });
+  }
+
+  register(username, firstname, lastname, phonenumber, password) {
+    console.log("url: " + API_URL + "registerWithCode");
+    return axiosInstance
+      .post(API_URL + "registerWithCode", {
+        username,
+        firstname,
+        lastname,
+        phonenumber,
+        password,
+      })
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 409) {
+          throw new Error("User already exists");
+        } else {
+          throw new Error("Registration failed");
+        }
+      });
+  }
+
+  verifyRegistrationCode(username, code, callback) {
+    console.log("url: " + API_URL + "verifyRegistrationCode");
+    const requestOptions = {
+      method: "POST",
+      url: API_URL + "verifyRegistrationCode",
+      data: { username, code },
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "https://alwaysnearme.com",
+      },
+    };
+    axios(requestOptions)
+      .then((response) => callback(null, response.data))
+      .catch((error) => callback(error, null));
+  }
 
   getprofile(username) {
     console.log("API_URL: " + API_URL);
-    var result = axios
-    .post(API_URL + "getprofile",  {
-      username
-    }, {
-      headers: { 'accessToken': document.cookie}})
-    .then(response => {
-		if (!response) {
-			console.log("no response????");
-		}
-      console.log("response getprofile here");
-	  console.log("profileData");
-	  return(response.data);
-      if (response.data.accessToken) {
-        document.cookie= "token=" + JSON.stringify(response.data);
-//          localStorage.setItem("user", JSON.stringify(response.data));
-      }
-
-      return response.data;
-    })
-    .catch(error => {
-      console.log(error.response.data);  
-      console.log(error.response.status);  
-      console.log(error.response.headers); 
-      return error;
-    })
-
-    console.log(" get profile ");
+    return axios
+      .post(API_URL + "getprofile", {
+        username,
+      })
+      .then((response) => response.data)
+      .catch((error) => {
+        console.log(error.response);
+        return error;
+      });
   }
 
   getCurrentUser() {
-    return JSON.parse(localStorage.getItem('username'));;
+    return JSON.parse(localStorage.getItem("username"));
   }
 }
 

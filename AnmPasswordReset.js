@@ -28,6 +28,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function AnmPasswordReset({ username, onClose, onSuccess }) {
+  console.log("AnmPasswordReset");
+
   const classes = useStyles();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -51,7 +53,7 @@ export default function AnmPasswordReset({ username, onClose, onSuccess }) {
       if (error) {
         setErrorMessage('Failed to reset password. Please try again.');
       } else {
-        setAlertTimedMessage('Password Reset Successful. Please log in.');
+        setAlertTimedMessage('Password Reset. Please log in.');
         setAlertTimed(true); // Show overlay and timed alert
         setTimeout(() => {
           setAlertTimed(false); // Close the alert after 3 seconds

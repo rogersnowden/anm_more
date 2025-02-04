@@ -1,45 +1,22 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { AuthContext } from './AuthContext';
-import ErrorMessage from './ErrorMessage';
-//import ExistingUserDialogue from './ExistingUserDialogue';
-//import AlertMessageDialog from './AlertMessage';
+import React, { useState } from 'react';
+import { TextField, Button, Typography, Grid } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import AuthService from './services/auth.service';
+import AnmPasswordVerify from './AnmPasswordVerify';
 import AnmStyledAlert from './AnmStyledAlert';
 
-//import Overlay from './Overlay';
-
-import AuthService from "./services/auth.service";
-//import axios from "axios";
-import { makeStyles } from '@mui/styles';
-import { TextField, Button, ButtonBase, Grid, Typography } from '@mui/material';
-
 const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100vh',
-    position: 'fixed',
-    top: '10%',
-    left: '35%',
-    zIndex: 9999,
-  },
   form: {
     width: '300px',
     padding: theme.spacing(2),
     borderRadius: theme.spacing(1),
     backgroundColor: '#ADD1F5',
-
-  },
-  overlayForm: {
-    zIndex: 9998,
+    position: 'relative',
+    zIndex: 10,
   },
   input: {
     backgroundColor: 'white',
     marginBottom: theme.spacing(2),
-  },
-  messagebox: {
-    backgroundColor: 'white',
-    marginBottom: theme.spacing(1),
   },
   buttonContainer: {
     display: 'flex',
@@ -51,12 +28,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AnmRegister({onClose, onRegistrationSuccess}) {
+export default function AnmRegister({ onClose, onRegistrationSuccess }) {
+  console.log("AnmRegister");
   const classes = useStyles();
 
-  // state stuff here
-  const [showComponent, setShowComponent] = useState(true);
-  // State to hold the form data
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -65,26 +40,12 @@ export default function AnmRegister({onClose, onRegistrationSuccess}) {
     firstname: '',
     lastname: '',
   });
+
   const [formErrors, setFormErrors] = useState({});
-
-  const [phoneError, setPhoneError] = useState('');
-  const [errormessage, setErrormessage] = useState();
-  // this controls alert dismissal, success/failure
-  const [isSuccessAlert, setIsSuccessAlert] = useState(false);
-  const [message, setMessage] = useState('');
-  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
-  const [overlayOpen, setOverlayOpen] = useState(false);
-  const { isLoggedIn, setIsLoggedIn} = useContext(AuthContext);
-  const [existingUserDialogueOpen, setExistingUserDialogueOpen] = useState(false);
-
-  //debug code for overlay handling diag
-  useEffect(() => {
-    console.log("Comp updated. Overlay open: ", overlayOpen);
-    return() => {
-      console.log("Component unmounting");
-    };
-  }, [overlayOpen]);
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [verificationStep, setVerificationStep] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [showAlert, setShowAlert] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -94,222 +55,174 @@ export default function AnmRegister({onClose, onRegistrationSuccess}) {
     }));
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-  
-    // Validate the form
-    const errors = validateForm(formData);
-    setFormErrors(errors);
-  
-    // If there are no errors, proceed with form submission
-    if (Object.keys(errors).length === 0) {
-      AuthService.register(
-        formData.username.trim(),
-        formData.password.trim(),
-        formData.firstname.trim(),
-        formData.lastname.trim(),
-        formData.phonenumber.trim()
-      )
-        .then((data) => {
-          console.log("successful registration", data);
-          setIsLoggedIn(false);//seems odd, but need to login again
-          setMessage("New Registration successful, please log in");
-          setMessageDialogOpen(true);
-          setOverlayOpen(true);
-          setShowComponent(false); // after popup dismissed, dismiss 'this'
-          setIsSuccessAlert(true);
-        })
-        .catch((error) => {
-          setIsLoggedIn(false);
-          setIsSuccessAlert(false);
-
-          // Check if the error message is "User already exists"
-          if (error.message === 'User already exists') {
-            // If it is, show the pop-up dialog
-//            setExistingUserDialogueOpen(true);
-              setMessage("User Already Exists");
-              setMessageDialogOpen(true);
-              setOverlayOpen(true);
-          } else {
-            // Handle other error cases if needed
-            setMessage(error.message);
-            setMessageDialogOpen(true);
-            setOverlayOpen(true);
-          }
-        });
-    }
-  };
-
-  const closeAlert = () => {
-//    setOverlayOpen(false);
-    if (isSuccessAlert) {
-      onRegistrationSuccess();
-    }
-    setMessageDialogOpen(false);
-  }
-
   const validateForm = (data) => {
     const errors = {};
-    // Regular expression for US phone number validation.
-    const phoneRegex = /^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/;
-    // Validate username, password, and other fields here...
-    if (!data.username) {
-      errors.username = 'Please enter a username (email address).';
-    }
-    if (!data.password) {
-      errors.password = 'Please enter a password.';
-    }
-    if (data.password !== data.password2) {
-      errors.password2 = 'Passwords do not match.';
-    }
-    if (!phoneRegex.test(data.phonenumber)) {
-      errors.phonenumber = 'Please enter a valid US phone number.';
-    }
+    const phoneRegex = /^\(?\d{3}\)?[- ]?\d{3}[- ]?\d{4}$/;
 
-    // Add more validation rules for other fields if needed...
+    if (!data.username) errors.username = 'Email address is required.';
+    if (!data.phonenumber || !phoneRegex.test(data.phonenumber)) errors.phonenumber = 'Valid phone number is required.';
+    if (!data.firstname) errors.firstname = 'First name is required.';
+    if (!data.lastname) errors.lastname = 'Last name is required.';
+    if (!data.password) errors.password = 'Password is required.';
+    if (data.password !== data.password2) errors.password2 = 'Passwords must match.';
 
     return errors;
   };
 
-  function handleCancel() {
-    setShowComponent(false);
-    onClose();
-//    console.log("record cancel");
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const errors = validateForm(formData);
+    setFormErrors(errors);
+
+    if (Object.keys(errors).length === 0) {
+      setIsSubmitting(true);
+      AuthService.register(
+        formData.username.trim(),
+        formData.firstname.trim(),
+        formData.lastname.trim(),
+        formData.phonenumber.trim(),
+        formData.password.trim(),
+      )
+        .then(() => {
+          setVerificationStep(true);
+//          setAlertMessage('Verification code sent to your email. Please enter it below.');
+//          setShowAlert(true);
+        })
+        .catch((error) => {
+          setAlertMessage(error.message || 'Registration failed.');
+          setShowAlert(true);
+        })
+        .finally(() => setIsSubmitting(false));
+    }
   };
 
+  const handleVerificationSuccess = () => {
+//    setAlertMessage('Registration successful! You can now log in.');
+//    setShowAlert(true);
+    setTimeout(() => {
+      onRegistrationSuccess();
+    }, 3000);
+  };
+
+  const handleCancel = () => {
+    onClose();
+  };
 
   return (
-    <div className={classes.root}>
-      {showComponent && (
+    <>
+      {!verificationStep ? (
         <form className={classes.form} onSubmit={handleSubmit}>
+          <Typography variant="h5" color="black" align="center">
+            Register New User
+          </Typography>
+          <TextField
+            className={classes.input}
+            label="Email Address"
+            name="username"
+            variant="outlined"
+            fullWidth
+            value={formData.username}
+            onChange={handleChange}
+            error={!!formErrors.username}
+            helperText={formErrors.username}
+          />
+          <TextField
+            className={classes.input}
+            label="First Name"
+            name="firstname"
+            variant="outlined"
+            fullWidth
+            value={formData.firstname}
+            onChange={handleChange}
+            error={!!formErrors.firstname}
+            helperText={formErrors.firstname}
+          />
+          <TextField
+            className={classes.input}
+            label="Last Name"
+            name="lastname"
+            variant="outlined"
+            fullWidth
+            value={formData.lastname}
+            onChange={handleChange}
+            error={!!formErrors.lastname}
+            helperText={formErrors.lastname}
+          />
+          <TextField
+            className={classes.input}
+            label="Phone Number"
+            name="phonenumber"
+            variant="outlined"
+            fullWidth
+            value={formData.phonenumber}
+            onChange={handleChange}
+            error={!!formErrors.phonenumber}
+            helperText={formErrors.phonenumber}
+          />
+          <TextField
+            className={classes.input}
+            label="Password"
+            name="password"
+            type="password"
+            variant="outlined"
+            fullWidth
+            value={formData.password}
+            onChange={handleChange}
+            error={!!formErrors.password}
+            helperText={formErrors.password}
+          />
+          <TextField
+            className={classes.input}
+            label="Confirm Password"
+            name="password2"
+            type="password"
+            variant="outlined"
+            fullWidth
+            value={formData.password2}
+            onChange={handleChange}
+            error={!!formErrors.password2}
+            helperText={formErrors.password2}
+          />
           <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Typography color="black" variant="h5" align="center">
-                Register New User
-              </Typography>
-            </Grid>
-            {formErrors.username && (
-              <Grid item xs={12}>
-                <ErrorMessage message={formErrors.username} />
-              </Grid>
-            )}
-            <Grid item xs={12}>
-              <TextField
-                className={classes.input}
-                label="Username (email address)"
-                variant="outlined"
+            <Grid item xs={6}>
+              <Button
+                className={classes.button}
+                type="submit"
+                variant="contained"
+                color="primary"
                 fullWidth
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                error={Boolean(formErrors.username)}
-              />
+                disabled={isSubmitting}
+              >
+                Submit
+              </Button>
             </Grid>
-            {formErrors.password && (
-              <Grid item xs={12}>
-                <ErrorMessage message={formErrors.password} />
-              </Grid>
-            )}
-            <Grid item xs={12}>
-              <TextField
-                className={classes.input}
-                label="Password"
-                variant="outlined"
+            <Grid item xs={6}>
+              <Button
+                className={classes.button}
+                onClick={handleCancel}
+                variant="contained"
+                color="secondary"
                 fullWidth
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                error={Boolean(formErrors.password)}
-              />
-            </Grid>
-            {formErrors.password2 && (
-              <Grid item xs={12}>
-                <ErrorMessage message={formErrors.password2} />
-              </Grid>
-            )}
-            <Grid item xs={12}>
-              <TextField
-                className={classes.input}
-                label="Reenter Password"
-                variant="outlined"
-                fullWidth
-                name="password2"
-                value={formData.password2}
-                onChange={handleChange}
-                error={Boolean(formErrors.password2)}
-              />
-            </Grid>
-            {formErrors.phonenumber && (
-              <Grid item xs={12}>
-                <ErrorMessage message={formErrors.phonenNumber} />
-              </Grid>
-            )}
-            <Grid item xs={12}>
-              <TextField
-                className={classes.input}
-                label="Phone Number"
-                variant="outlined"
-                fullWidth
-                name="phonenumber"
-                value={formData.phonenumber}
-                onChange={handleChange}
-                error={Boolean(formErrors.phonenumber)}
-              />
-            </Grid>
-            {/* Add error display for other fields as needed... */}
-            <Grid item xs={12}>
-              <TextField
-                className={classes.input}
-                label="First Name"
-                variant="outlined"
-                fullWidth
-                name="firstname"
-                value={formData.firstname}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                className={classes.input}
-                label="Last Name"
-                variant="outlined"
-                fullWidth
-                name="lastname"
-                value={formData.lastname}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <div className={classes.buttonContainer}>
-                <Button
-                  className={classes.button}
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                >
-                  Submit
-                </Button>
-                <Button
-                  onClick={handleCancel}
-                  className={classes.button}
-                  type="button"
-                  variant="contained"
-                  color="primary"
-                >
-                  Cancel
-                </Button>
-              </div>
+              >
+                Cancel
+              </Button>
             </Grid>
           </Grid>
         </form>
-      )}
-      <div>
-        <AnmStyledAlert
-          open={messageDialogOpen}
-          onClose={closeAlert}
-          alertMessage={message}
+      ) : (
+        <AnmPasswordVerify
+          username={formData.username}
+          onClose={handleCancel}
+          onSuccess={handleVerificationSuccess}
         />
-      </div>
-    </div>
+      )}
+
+      <AnmStyledAlert
+        open={showAlert}
+        color="black"
+        onClose={() => setShowAlert(false)}
+        alertMessage={alertMessage}
+      />
+    </>
   );
 }

@@ -1,3 +1,4 @@
+// MenuAppBar.js
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from './AuthContext';
 import ProdService from "./services/prod.service";

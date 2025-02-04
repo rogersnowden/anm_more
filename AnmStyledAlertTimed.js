@@ -31,6 +31,8 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function AnmStyledAlertTimed({ open, onClose, alertMessage }) {
+  console.log("AnmStyledAlertTimed");
+
   const classes = useStyles();
   const [remainingSquares, setRemainingSquares] = useState([]);
 
@@ -58,7 +60,7 @@ export default function AnmStyledAlertTimed({ open, onClose, alertMessage }) {
 
   return (
     <div className={classes.root}>
-      <Typography variant="h6" align="center">
+      <Typography variant="h6" color="black" align="center">
         {alertMessage}
       </Typography>
       <Box className={classes.progressBar}>

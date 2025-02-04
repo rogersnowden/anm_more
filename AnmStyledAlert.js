@@ -28,6 +28,8 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function AnmStyledAlert({ open, onClose, alertMessage }) {
+  console.log("AnmStyledAlert");
+
   const classes = useStyles();
 
   if (!open) return null; // Don't render if not open

@@ -1,3 +1,4 @@
+// AnmPasswordRecover.js
 import React, { useState, useContext, useEffect } from 'react';
 import { makeStyles } from '@mui/styles';
 import { TextField, Button, Typography, Grid } from '@mui/material';
@@ -37,6 +38,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function AnmPasswordRecover({ open, onClose, onSuccess }) {
+  console.log("AnmPasswordRecover");
   const classes = useStyles();
   const [username, setUsername] = useState('');
   const [errorMessage, setErrorMessage] = useState('');

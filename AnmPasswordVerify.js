@@ -27,6 +27,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function AnmPasswordVerify({ username, onClose, onSuccess }) {
+  console.log("AnmPasswordVerify");
+
   const classes = useStyles();
   const [code, setCode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -38,7 +40,7 @@ export default function AnmPasswordVerify({ username, onClose, onSuccess }) {
     }
 
     // Call server to verify the code
-    AuthService.verifyResetCode(username, code, (error) => {
+    AuthService.verifyRegistrationCode(username, code, (error) => {
       if (error) {
         setErrorMessage('Invalid or expired code. Please try again.');
       } else {

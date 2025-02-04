@@ -1,3 +1,4 @@
+// Logout.js
 import React, { useState, useContext } from 'react';
 import { AuthContext } from './AuthContext';
 
