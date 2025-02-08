@@ -44,7 +44,7 @@ class AuthService {
     axios
       .post(API_URL + "logout", {
         username,
-      })
+      }, {withCredntials: true})
       .then((response) => {
         if (response.data) {
           console.log("logout resp: " + response);
@@ -89,10 +89,6 @@ class AuthService {
     };
     axios(requestOptions)
       .then((response) => {
-        if (response.data) {
-          var thisCookie = "accessToken=" + response.data.accessToken;
-          document.cookie = thisCookie;
-        }
         callback(null, response.data);
       })
       .catch((error) => {
@@ -138,7 +134,7 @@ class AuthService {
         lastname,
         phonenumber,
         password,
-      })
+      }, {withCredentials: true})
       .then((response) => {
         return response.data;
       })
@@ -173,7 +169,7 @@ class AuthService {
     return axios
       .post(API_URL + "getprofile", {
         username,
-      })
+      }, {withCredentials: true})
       .then((response) => response.data)
       .catch((error) => {
         console.log(error.response);
