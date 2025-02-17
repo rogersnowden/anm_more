@@ -1,8 +1,10 @@
 // AnmPasswordVerify
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { AuthContext } from './AuthContext';
 import { TextField, Button, Typography, Grid } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import AuthService from './services/auth.service';
+//import AnmStyledAlertTimed from './AnmStyledAlertTimed';
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -27,11 +29,16 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function AnmPasswordVerify({ username, onClose, onSuccess }) {
-  console.log("AnmPasswordVerify");
+  console.log("AnmPasswordVerify begin");
 
   const classes = useStyles();
   const [code, setCode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [alertTimed, setAlertTimed] = useState(false);
+  const [alertTimedMessage, setAlertTimedMessage] = useState('');
+  const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
+  const { setUserName, setFirstName, setIsVerified, setOwnsProduct } = useContext(AuthContext);
+  
 
   const handleVerify = () => {
     if (!code) {
@@ -40,12 +47,23 @@ export default function AnmPasswordVerify({ username, onClose, onSuccess }) {
     }
 
     // Call server to verify the code
+    console.log("AnmPasswordVerify calling verifyRegistrationCode");
+    console.log("username: " + username);
     AuthService.verifyRegistrationCode(username, code, (error) => {
       if (error) {
         setErrorMessage('Invalid or expired code. Please try again.');
       } else {
-//        alert('Verification successful. Please reset your password.');
-        onSuccess(); // Transition to the password reset form
+        //set logged in so MenuAppBar will initialize login stuff
+        console.log("AnmPasswordVerify, setting setUserName: " + username);
+        setIsLoggedIn(true);
+        setUserName(username);
+//        setAlertTimedMessage('Account Verified. Logging in now.');
+//        setAlertTimed(true); // Show overlay and timed alert
+//        setTimeout(() => {
+//          setAlertTimed(false); // Close the alert after 3 seconds
+//          onSuccess(); // Notify parent and return to login
+//        }, 3000);
+      onSuccess();
       }
     });
   };

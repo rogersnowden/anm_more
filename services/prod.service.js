@@ -17,6 +17,7 @@ class ProdService {
 
   // status: 'Ready to Record', 'Recorded', 'Shared'
   async getLibrary(userName) {
+    console.log("prod.service getLibrary, userName: " + userName);
     try {
       const response = await axiosInstance.post('getLibrary', { userName });
       return response.data;

@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+// AnmPasswordReset.js
+import React, { useState, useContext } from 'react';
+import { AuthContext } from './AuthContext';
 import { TextField, Button, Typography, Grid } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import AuthService from './services/auth.service';
@@ -28,9 +30,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function AnmPasswordReset({ username, onClose, onSuccess }) {
-  console.log("AnmPasswordReset");
+  console.log("AnmPasswordReset begin");
 
   const classes = useStyles();
+  const { userName, setUserName } = useContext(AuthContext);
+  const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -53,7 +57,9 @@ export default function AnmPasswordReset({ username, onClose, onSuccess }) {
       if (error) {
         setErrorMessage('Failed to reset password. Please try again.');
       } else {
-        setAlertTimedMessage('Password Reset. Please log in.');
+        //set logged in so MenuAppBar will initialize login stuff
+        setIsLoggedIn(true);
+        setAlertTimedMessage('Account verified. Loggin in...');
         setAlertTimed(true); // Show overlay and timed alert
         setTimeout(() => {
           setAlertTimed(false); // Close the alert after 3 seconds

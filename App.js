@@ -25,7 +25,7 @@ const theme = createTheme({
 });
 
 export default function App() {
-
+console.log("App begins");
   const useStyles = makeStyles((theme) => ({
       appBar: {
       paddingBottom: '15vw',

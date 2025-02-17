@@ -44,6 +44,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Login() {
+  console.log("Login");
   const classes = useStyles();
   const [showComponent, setShowComponent] = useState(true);
   const [username, setUsername] = useState('');
@@ -66,7 +67,8 @@ export default function Login() {
       return;
     }
     AuthService.login(username.trim(), password.trim(), (error, data) => {
-      console.log("Login");
+      console.log("Login begin");
+      console.log('username: ' + username + " logged in: " + isLoggedIn);
 
       if (error) {
         setIsLoggedIn(false);
@@ -209,7 +211,7 @@ export default function Login() {
           onClose={() => setPasswordResetOpen(false)}
           onSuccess={() => {
             setPasswordResetOpen(false);
-            setShowComponent(true);
+            setShowComponent(false);
           }}
         />
       )}

@@ -70,10 +70,11 @@ export default function MenuAppBar(props) {
   const [messageCount, setMessageCount] = useState(2);
 
   useEffect(() => {
-    console.log("isLoggedIn: ", isLoggedIn, "userName: ", userName);
+    console.log("MenuAppBar getLibrary isLoggedIn: ", isLoggedIn, "userName: ", userName);
     if (isLoggedIn && userName) {
       const fetchLibrary = async () => {
         try {
+          console.log("MenuAppBar get lib: " + userName);
           const data = await ProdService.getLibrary(userName);
           console.log("getLibrary successful", data);
           setLibraryItems(data);
