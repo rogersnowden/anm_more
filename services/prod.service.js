@@ -15,6 +15,19 @@ console.log("cookie: " + cookie);
 
 class ProdService {
 
+  // get available books, from catalog
+  async getCatalog() {
+    console.log("prod.service getCatalog");
+    try {
+      const response = await axiosInstance.post('getCatalog');
+      return response.data;
+    } catch (error) {
+      // Handle or throw the error as needed
+      console.error("Error in getCatalog:", error);
+      throw error;
+    }
+  }
+
   // status: 'Ready to Record', 'Recorded', 'Shared'
   async getLibrary(userName) {
     console.log("prod.service getLibrary, userName: " + userName);

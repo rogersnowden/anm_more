@@ -16,7 +16,7 @@ import NotificationAddIcon from '@mui/icons-material/NotificationAdd';
 import Box from '@mui/material/Box';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
-import MailIcon from '@material-ui/icons/Mail';
+import MailIcon from '@mui/icons-material/Mail';
 import PersonIcon from '@mui/icons-material/Person';
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -68,28 +68,6 @@ export default function MenuAppBar(props) {
 
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
   const [messageCount, setMessageCount] = useState(2);
-
-  useEffect(() => {
-    console.log("MenuAppBar getLibrary isLoggedIn: ", isLoggedIn, "userName: ", userName);
-    if (isLoggedIn && userName) {
-      const fetchLibrary = async () => {
-        try {
-          console.log("MenuAppBar get lib: " + userName);
-          const data = await ProdService.getLibrary(userName);
-          console.log("getLibrary successful", data);
-          setLibraryItems(data);
-        } catch (error) {
-          setLibraryItems([]);
-          setMessage(`Library for user ${userName} not found`);
-          setMessageDialogOpen(true);
-          console.error("Error fetching library:", error);
-        }
-      };
-      fetchLibrary();
-    } else {
-      setLibraryItems(null);
-    }
-  }, [isLoggedIn, userName]);
 
   useEffect(() => {
     if (userBook) {

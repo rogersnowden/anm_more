@@ -1,4 +1,5 @@
-import { createContext, useState } from 'react';
+import { createContext, useState, useEffect } from 'react';
+import ProdService from './services/prod.service';
 
 const AuthContext = createContext();
 
@@ -8,17 +9,40 @@ const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState(null);
   const [firstName, setFirstName] = useState(null);
-  const [isVerified, setIsVerified] = useState(false);
-  const [ownsProduct, setOwnsProduct] = useState(false);
-  const [libraryItems, setLibraryItems] = useState();
-  const [wasCancelled, setWasCancelled] = useState(false);
-  const [productSKU, setProductSKU] = useState();
-  const [userBook, setUserBook] = useState();
-  const [userBookPageCount, setUserBookPageCount] = useState();
-  const [productResponse, setProductResponse] = useState();
+  const [libraryItems, setLibraryItems] = useState([]);
+  const [catalog, setCatalog] = useState([]);
 
-  console.log("AuthProvider isLoggedIn: ", isLoggedIn);
-  console.log("AuthProvider userBook: ", userBook);
+  // Function to load the catalog (can be called on demand)
+  const loadCatalog = async () => {
+    try {
+      const data = await ProdService.getCatalog();
+      setCatalog(data || []);
+      console.log("Catalog fetched:", data);
+    } catch (error) {
+      console.log("Error fetching catalog:", error);
+      setCatalog([]);
+    }
+  };
+
+  // Fetch catalog at startup
+  useEffect(() => {
+    loadCatalog();
+  }, []);
+
+  // Fetch library when the user logs in
+  useEffect(() => {
+    if (isLoggedIn && userName) {
+      const fetchLibrary = async () => {
+        try {
+          const data = await ProdService.getLibrary(userName);
+          setLibraryItems(data.librarycontents || []);
+        } catch (error) {
+          setLibraryItems([]);
+        }
+      };
+      fetchLibrary();
+    }
+  }, [isLoggedIn, userName]);
 
   return (
     <AuthContext.Provider value={{ 
@@ -27,15 +51,9 @@ const AuthProvider = ({ children }) => {
       isLoggedIn, setIsLoggedIn, 
       userName, setUserName,
       firstName, setFirstName,
-      isVerified, setIsVerified,
-      ownsProduct, setOwnsProduct,
       libraryItems, setLibraryItems,
-      wasCancelled, setWasCancelled,
-      productSKU, setProductSKU,
-      userBook, setUserBook,
-      userBookPageCount, setUserBookPageCount,
-      productResponse, setProductResponse,
-       }}>
+      catalog, setCatalog, loadCatalog // ✅ Added loadCatalog function
+    }}>
       {children}
     </AuthContext.Provider>
   );

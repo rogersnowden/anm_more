@@ -28,18 +28,17 @@
   color: #ffffff;
 }
 
+/* Fix: Remove quotes from color & background properties */
 .alert-shown {
-  color: '#83CDF6';
-  background-color: "#E0ECF3";
-  background: "#83CDF6";
-
+  color: #83CDF6;
+  background-color: #E0ECF3;
+  background: #83CDF6;
 }
 
 .alert-hidden {
-  color: '#83CDF6';
-  background-color: "#dddddd";
-  background: "#93CDF6";
-
+  color: #83CDF6;
+  background-color: #dddddd;
+  background: #93CDF6;
 }
 
 @keyframes App-logo-spin {
